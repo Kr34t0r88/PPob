@@ -1,0 +1,73 @@
+<!-- Web Live Chat Widget (Telegram Bridge) -->
+<link rel="stylesheet" href="/public/css/livechat.css">
+
+<!-- Floating Trigger Button -->
+<div id="livechat-badge-btn" class="livechat-badge-btn" title="Live Chat Bantuan CS">
+  <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+  </svg>
+  <span id="livechat-badge-count" class="livechat-unread-dot" style="display: none;">0</span>
+</div>
+
+<!-- Floating Chat Window -->
+<div id="livechat-window" class="livechat-window">
+  
+  <!-- Header -->
+  <div class="livechat-header">
+    <div class="flex items-center gap-2.5">
+      <div class="relative">
+        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-sky-600 to-blue-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
+          <span>CS</span>
+        </div>
+        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-slate-900 animate-pulse"></span>
+      </div>
+      <div>
+        <h4 class="text-xs font-bold text-white tracking-wide">
+          <span>Customer Service</span>
+        </h4>
+        <p class="text-[10px] text-emerald-400 font-medium flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span>Online • Siap Membantu</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-1">
+      <button type="button" id="livechat-reset-btn" class="p-1.5 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-slate-800 transition-colors" title="Akhiri & Mulai Chat Baru">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+      </button>
+      <button type="button" id="livechat-close-btn" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors" title="Tutup Chat">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Messages Body -->
+  <div id="livechat-body" class="livechat-body">
+    <div id="livechat-messages-container" class="flex flex-col gap-2.5">
+      <!-- Pesan akan dirender di sini via JS -->
+    </div>
+  </div>
+
+  <!-- Footer Input Bar -->
+  <div class="livechat-footer">
+    
+    <!-- Quick Question Chips -->
+    <div class="livechat-quick-btns">
+      <button type="button" class="livechat-quick-btn" onclick="sendLiveChatQuickMsg('Halo min, saya butuh bantuan konfirmasi pesanan.')">⚡ Konfirmasi Pesanan</button>
+      <button type="button" class="livechat-quick-btn" onclick="sendLiveChatQuickMsg('Bagaimana cara bayar invoice via QRIS?')">💳 Tanya Cara Bayar</button>
+      <button type="button" class="livechat-quick-btn" onclick="sendLiveChatQuickMsg('Berapa lama proses transaksi top-up?')">⏱️ Waktu Proses</button>
+    </div>
+
+    <form id="livechat-send-form" class="flex items-center gap-2">
+      <input type="text" id="livechat-input" placeholder="Ketik pesan untuk CS..." required autocomplete="off" class="flex-1 bg-slate-800/80 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all" />
+      
+      <button type="submit" class="p-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl shadow-md shadow-sky-600/30 active:scale-95 transition-all" title="Kirim Pesan">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+      </button>
+    </form>
+  </div>
+
+</div>
+
+<script src="/public/js/livechat.js"></script>

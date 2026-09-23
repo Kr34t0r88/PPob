@@ -1,0 +1,354 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Juragan Pulsa - Bespoke Fintech Design System
+   Refined Modern UI (Non-generic, Pro Dashboard Design)
+   ─────────────────────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  --sidebar-bg: #090D16;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-text: #94A3B8;
+  --sidebar-text-active: #FFFFFF;
+  --sidebar-active-bg: rgba(37, 99, 235, 0.12);
+  --sidebar-active-border: #3B82F6;
+
+  --card-bg: #FFFFFF;
+  --card-border: #E2E8F0;
+  --bg-app: #F8FAFC;
+}
+
+[data-theme="dark"] {
+  --sidebar-bg: #06090F;
+  --sidebar-border: rgba(255, 255, 255, 0.04);
+  --card-bg: #0F172A;
+  --card-border: #1E293B;
+  --bg-app: #090D16;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-mono, .code-text, .currency {
+  font-family: var(--font-mono) !important;
+  font-feature-settings: "tnum" on, "zero" on;
+}
+
+/* ── Custom Scrollbar ── */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.6);
+}
+
+/* ── Professional Sidebar Styling ── */
+.pro-sidebar {
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
+}
+
+.custom-sidebar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+.custom-sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+.custom-sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.sidebar-heading {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #475569;
+  padding: 1.25rem 1rem 0.5rem 1rem;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--sidebar-text);
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.sidebar-nav-item:hover {
+  color: #F1F5F9;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sidebar-nav-item.active {
+  color: #FFFFFF;
+  background: var(--sidebar-active-bg);
+  font-weight: 600;
+}
+
+.sidebar-nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 15%;
+  height: 70%;
+  width: 3px;
+  background: var(--sidebar-active-border);
+  border-radius: 0 4px 4px 0;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.sidebar-nav-item svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  color: #64748B;
+  transition: color 0.15s ease;
+}
+
+.sidebar-nav-item:hover svg,
+.sidebar-nav-item.active svg {
+  color: #60A5FA;
+}
+
+/* ── Pro Metric / Stat Cards ── */
+.metric-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.metric-card:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+}
+
+.metric-card .metric-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748B;
+}
+
+.metric-card .metric-value {
+  font-family: var(--font-mono);
+  font-size: 1.625rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-top: 0.35rem;
+}
+
+.metric-icon-box {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Status Badges (Crisp Fintech Style) ── */
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.badge-status-success {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.badge-status-pending {
+  background: rgba(245, 158, 11, 0.1);
+  color: #D97706;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.badge-status-failed {
+  background: rgba(239, 68, 68, 0.1);
+  color: #DC2626;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.badge-status-refund {
+  background: rgba(99, 102, 241, 0.1);
+  color: #4F46E5;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+/* ── Pulse Status Dots ── */
+.dot-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  position: relative;
+}
+.dot-pulse-success {
+  background: #10B981;
+}
+.dot-pulse-success::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.4);
+  animation: dotPulse 2s infinite;
+}
+.dot-pulse-pending {
+  background: #F59E0B;
+}
+.dot-pulse-failed {
+  background: #EF4444;
+}
+
+@keyframes dotPulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(2.2); opacity: 0; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+/* ── Clean Fintech Table ── */
+.fintech-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.fintech-table thead th {
+  background: rgba(241, 245, 249, 0.7);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748B;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+[data-theme="dark"] .fintech-table thead th {
+  background: rgba(30, 41, 59, 0.5);
+  color: #94A3B8;
+}
+
+.fintech-table tbody tr {
+  transition: background-color 0.12s ease;
+}
+
+.fintech-table tbody tr:hover {
+  background-color: rgba(241, 245, 249, 0.6);
+}
+
+[data-theme="dark"] .fintech-table tbody tr:hover {
+  background-color: rgba(30, 41, 59, 0.4);
+}
+
+.fintech-table tbody td {
+  padding: 0.875rem 1rem;
+  font-size: 0.8125rem;
+  border-bottom: 1px solid var(--card-border);
+  vertical-align: middle;
+}
+
+.fintech-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Copy to Clipboard Button ── */
+.btn-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.375rem;
+  font-size: 0.6875rem;
+  font-family: var(--font-mono);
+  background: rgba(148, 163, 184, 0.1);
+  color: #475569;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-copy:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563EB;
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+/* ── Modern Form Controls ── */
+.input-fintech {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 0.625rem;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.8125rem;
+  transition: all 0.15s ease;
+}
+
+.input-fintech:focus {
+  outline: none;
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* ── Toast Notification Container ── */
+.toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 380px;
+}
+.toast-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 30px -5px rgba(0,0,0,0.15);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  backdrop-filter: blur(8px);
+}

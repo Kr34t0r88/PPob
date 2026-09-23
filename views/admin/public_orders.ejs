@@ -1,0 +1,225 @@
+<%- include('../partials/header') %>
+
+<div class="space-y-5">
+
+  <!-- Header Action Bar -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div>
+      <h3 class="text-lg lg:text-xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+        <span>🌐 Transaksi Web Store Publik</span>
+        <span class="badge badge-sm bg-blue-600 text-white font-mono text-[10px]">Direct Top-Up</span>
+      </h3>
+      <p class="text-xs text-slate-500">Daftar transaksi pengunjung tanpa akun melalui Web Store / QRIS Dinamis.</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="/" target="_blank" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-0 text-xs font-semibold gap-1.5 shadow-sm">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+        <span>Buka Web Publik</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Metric Summary Cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+      <span class="text-[11px] font-medium text-slate-500 block mb-1">Total Pesanan</span>
+      <div class="text-lg sm:text-xl font-extrabold font-mono text-slate-900 dark:text-white"><%= (stats.total || 0).toLocaleString('id-ID') %></div>
+      <span class="text-[10px] text-slate-400">Semua order publik</span>
+    </div>
+
+    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+      <span class="text-[11px] font-medium text-slate-500 block mb-1">Sukses Terkirim</span>
+      <div class="text-lg sm:text-xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400"><%= (stats.success_count || 0).toLocaleString('id-ID') %></div>
+      <span class="text-[10px] text-slate-400">Omset: <%= formatRupiah(stats.total_omset || 0) %></span>
+    </div>
+
+    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+      <span class="text-[11px] font-medium text-slate-500 block mb-1">Pending / QRIS Aktif</span>
+      <div class="text-lg sm:text-xl font-extrabold font-mono text-amber-500"><%= (stats.pending_count || 0).toLocaleString('id-ID') %></div>
+      <span class="text-[10px] text-slate-400">Menunggu pembayaran</span>
+    </div>
+
+    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+      <span class="text-[11px] font-medium text-slate-500 block mb-1">Total Keuntungan Bersih</span>
+      <div class="text-lg sm:text-xl font-extrabold font-mono text-blue-600 dark:text-blue-400"><%= formatRupiah(stats.total_profit || 0) %></div>
+      <span class="text-[10px] text-slate-400">Margin + Kode Unik</span>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+    <form action="/admin/public-orders" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+      <div>
+        <input type="text" name="q" value="<%= filter.q || '' %>" placeholder="Cari invoice, produk, tujuan, WA, SN..." class="input-fintech w-full" />
+      </div>
+
+      <div>
+        <select name="status" class="input-fintech w-full">
+          <option value="">Semua Status</option>
+          <option value="pending" <%= filter.status === 'pending' ? 'selected' : '' %>>Pending (Menunggu Bayar)</option>
+          <option value="processing" <%= filter.status === 'processing' ? 'selected' : '' %>>Processing (Proses H2H)</option>
+          <option value="success" <%= filter.status === 'success' ? 'selected' : '' %>>Sukses</option>
+          <option value="failed" <%= filter.status === 'failed' ? 'selected' : '' %>>Gagal</option>
+          <option value="expired" <%= filter.status === 'expired' ? 'selected' : '' %>>Kedaluwarsa (Expired)</option>
+        </select>
+      </div>
+
+      <div>
+        <input type="date" name="date_from" value="<%= filter.date_from || '' %>" class="input-fintech w-full" placeholder="Dari Tanggal" />
+      </div>
+
+      <div class="flex gap-2">
+        <button type="submit" class="btn btn-sm bg-slate-900 hover:bg-slate-800 text-white border-0 flex-1 text-xs">Filter</button>
+        <a href="/admin/public-orders" class="btn btn-sm btn-ghost text-xs">Reset</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Table Card -->
+  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="fintech-table">
+        <thead>
+          <tr>
+            <th>Invoice / Waktu</th>
+            <th>Produk &amp; Kategori</th>
+            <th>Tujuan &amp; WhatsApp</th>
+            <th>Total Bayar (QRIS)</th>
+            <th>Status</th>
+            <th>SN / Keterangan</th>
+            <th class="text-right">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (orders && orders.length > 0) { %>
+            <% orders.forEach(o => { %>
+              <tr>
+                <td>
+                  <div class="font-mono text-xs font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                    <a href="/invoice/<%= o.invoice_code %>" target="_blank" class="hover:underline"><%= o.invoice_code %></a>
+                  </div>
+                  <div class="text-[10px] text-slate-400 mt-0.5"><%= formatDateTime(o.created_at) %></div>
+                </td>
+
+                <td>
+                  <div class="text-xs font-semibold text-slate-800 dark:text-slate-200"><%= o.product_name %></div>
+                  <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                    <%= o.category %> • <%= o.brand || '-' %>
+                  </span>
+                </td>
+
+                <td>
+                  <div class="font-mono text-xs font-bold text-slate-800 dark:text-slate-200"><%= o.target_combined %></div>
+                  <% if (o.buyer_phone) { 
+                       const buyerWa = o.buyer_phone.replace(/\D/g, '').replace(/^0/, '62');
+                  %>
+                    <a href="https://wa.me/<%= buyerWa %>" target="_blank" class="text-[10px] text-emerald-500 hover:underline flex items-center gap-1">
+                      <span>WA: <%= o.buyer_phone %></span>
+                    </a>
+                  <% } else { %>
+
+                    <span class="text-[10px] text-slate-400">-</span>
+                  <% } %>
+                </td>
+
+                <td>
+                  <div class="font-mono text-xs font-bold text-slate-900 dark:text-white"><%= formatRupiah(o.total_amount) %></div>
+                  <div class="text-[10px] text-slate-400">Kode Unik: +<%= o.unique_code %></div>
+                </td>
+
+                <td>
+                  <% if (o.status === 'success') { %>
+                    <span class="badge-status badge-status-success">
+                      <span class="dot-pulse dot-pulse-success"></span> Sukses
+                    </span>
+                  <% } else if (o.status === 'processing' || o.status === 'paid') { %>
+                    <span class="badge-status badge-status-pending">
+                      <span class="dot-pulse dot-pulse-pending"></span> Proses H2H
+                    </span>
+                  <% } else if (o.status === 'expired') { %>
+                    <span class="badge-status text-slate-400 bg-slate-100 dark:bg-slate-800">
+                      Kedaluwarsa
+                    </span>
+                  <% } else if (o.status === 'failed') { %>
+                    <span class="badge-status badge-status-failed">
+                      <span class="dot-pulse dot-pulse-failed"></span> Gagal
+                    </span>
+                  <% } else { %>
+                    <span class="badge-status badge-status-pending">
+                      <span class="dot-pulse dot-pulse-pending"></span> Pending
+                    </span>
+                  <% } %>
+                </td>
+
+                <td>
+                  <% if (o.sn) { %>
+                    <button type="button" onclick="copyToClipboard('<%= o.sn %>', 'SN')" class="btn-copy" title="Salin SN">
+                      <span class="font-mono text-xs text-yellow-600 dark:text-yellow-400 font-bold"><%= o.sn %></span>
+                      <svg class="w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+                    </button>
+                  <% } else if (o.message) { %>
+                    <span class="text-[11px] text-slate-500 truncate max-w-[180px] block" title="<%= o.message %>"><%= o.message %></span>
+                  <% } else { %>
+                    <span class="text-slate-400 text-xs">-</span>
+                  <% } %>
+                </td>
+
+                <td class="text-right">
+                  <div class="dropdown dropdown-end">
+                    <label tabindex="0" class="btn btn-ghost btn-xs text-slate-400 hover:text-white">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+                    </label>
+                    <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-xl bg-white dark:bg-slate-800 rounded-xl w-44 border border-slate-200 dark:border-slate-700 text-xs">
+                      <li>
+                        <form action="/admin/public-orders/<%= o.id %>/recheck" method="POST" class="p-0">
+                          <button type="submit" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg">
+                            🔄 Cek Status Vendor
+                          </button>
+                        </form>
+                      </li>
+                      <li>
+                        <form action="/admin/public-orders/<%= o.id %>/retry" method="POST" class="p-0" onsubmit="return confirm('Kirim ulang order ini ke Digiflazz H2H?')">
+                          <button type="submit" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-blue-600">
+                            ⚡ Trigger Ulang H2H
+                          </button>
+                        </form>
+                      </li>
+                      <li>
+                        <a href="/invoice/<%= o.invoice_code %>" target="_blank" class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg">
+                          🧾 Buka Invoice Publik
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="7" class="text-center py-10 text-xs text-slate-400">
+                Belum ada transaksi publik.
+              </td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <% if (pagination && pagination.totalPages > 1) { %>
+      <div class="p-3.5 border-t border-slate-100 dark:border-slate-800 flex justify-center">
+        <div class="join">
+          <% for(let i = 1; i <= pagination.totalPages; i++) { %>
+            <a href="/admin/public-orders?page=<%= i %>&q=<%= filter.q || '' %>&status=<%= filter.status || '' %>"
+               class="join-item btn btn-xs <%= pagination.page === i ? 'btn-active bg-blue-600 text-white border-0' : 'btn-ghost' %>">
+              <%= i %>
+            </a>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+</div>
+
+<%- include('../partials/footer') %>

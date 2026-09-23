@@ -1,0 +1,179 @@
+<%- include('../partials/header') %>
+
+<div class="space-y-5">
+
+  <!-- Header Action Bar -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div>
+      <h3 class="text-lg lg:text-xl font-bold text-slate-900 dark:text-white tracking-tight">Daftar Reseller & Agen</h3>
+      <p class="text-xs text-slate-500">Kelola akun agen pulsa, pantau deposit saldo, dan generate QR Code pairing login.</p>
+    </div>
+    <a href="/admin/agents/new" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-0 text-xs font-semibold gap-1.5 shadow-sm">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+      <span>Tambah Agen Baru</span>
+    </a>
+  </div>
+
+  <!-- Search & Filter Card -->
+  <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+    <form action="/admin/agents" method="GET" class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto flex-1">
+      <div class="w-full sm:w-64">
+        <input type="text" name="search" value="<%= typeof search !== 'undefined' ? search : '' %>" placeholder="Cari nama, username, no HP..." class="input-fintech w-full" />
+      </div>
+      
+      <div class="w-full sm:w-40">
+        <select name="status" class="input-fintech w-full">
+          <option value="">Semua Status</option>
+          <option value="active" <%= typeof status !== 'undefined' && status === 'active' ? 'selected' : '' %>>Aktif</option>
+          <option value="inactive" <%= typeof status !== 'undefined' && status === 'inactive' ? 'selected' : '' %>>Nonaktif</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-sm bg-slate-900 hover:bg-slate-800 text-white border-0 text-xs">Cari</button>
+      <% if ((typeof search !== 'undefined' && search) || (typeof status !== 'undefined' && status)) { %>
+        <a href="/admin/agents" class="btn btn-sm btn-ghost text-xs">Reset</a>
+      <% } %>
+    </form>
+    
+    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-300 self-end sm:self-center">
+      <span>Total Agen:</span>
+      <span class="font-bold text-slate-900 dark:text-white"><%= typeof total !== 'undefined' ? total : agents.length %></span>
+    </div>
+  </div>
+
+  <!-- Agents Table Card (Horizontal Touch-Scroll) -->
+  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="fintech-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nama Agen</th>
+            <th>Username</th>
+            <th>WhatsApp</th>
+            <th>Saldo Agen</th>
+            <th>QR Login</th>
+            <th>Status</th>
+            <th class="text-right">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (agents && agents.length > 0) { %>
+            <% agents.forEach(a => { %>
+              <tr>
+                <td class="font-mono text-xs text-slate-400">#<%= a.id %></td>
+                <td>
+                  <a href="/admin/agents/<%= a.id %>" class="font-bold text-xs text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400">
+                    <%= a.name %>
+                  </a>
+                  <% if (a.email) { %>
+                    <p class="text-[10px] text-slate-400"><%= a.email %></p>
+                  <% } %>
+                </td>
+                <td class="text-xs text-slate-600 dark:text-slate-300 font-mono">@<%= a.username %></td>
+                <td>
+                  <button type="button" onclick="copyToClipboard('<%= a.phone %>', 'Nomor HP')" class="btn-copy" title="Salin No HP">
+                    <span><%= a.phone %></span>
+                    <svg class="w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+                  </button>
+                </td>
+                <td class="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                  <%= formatRupiah(a.balance || 0) %>
+                </td>
+                <td>
+                  <button type="button" onclick="openQrModal('<%= a.id %>', '<%= a.name %>', '@<%= a.username %>', '<%= a.qrDataUrl %>', '<%= a.waShareLink %>')" class="btn btn-xs bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:border-blue-900 font-semibold gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                    <span>Scan QR</span>
+                  </button>
+                </td>
+                <td>
+                  <% if (a.is_active) { %>
+                    <span class="badge-status badge-status-success">
+                      <span class="dot-pulse dot-pulse-success"></span> Aktif
+                    </span>
+                  <% } else { %>
+                    <span class="badge-status badge-status-failed">
+                      <span class="dot-pulse dot-pulse-failed"></span> Nonaktif
+                    </span>
+                  <% } %>
+                </td>
+                <td class="text-right space-x-1">
+                  <a href="/admin/agents/<%= a.id %>" class="btn btn-xs btn-ghost text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 font-semibold text-[11px]">Detail</a>
+                  <form action="/admin/agents/<%= a.id %>/toggle" method="POST" class="inline">
+                    <button type="submit" class="btn btn-xs <%= a.is_active ? 'btn-ghost text-red-500 hover:bg-red-50' : 'btn-ghost text-emerald-600 hover:bg-emerald-50' %> font-semibold text-[11px]">
+                      <%= a.is_active ? 'Off' : 'On' %>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="8" class="text-center py-10 text-xs text-slate-400">Tidak ada agen ditemukan.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+      <div class="p-3.5 border-t border-slate-100 dark:border-slate-800 flex justify-center">
+        <div class="join">
+          <% for(let i = 1; i <= totalPages; i++) { %>
+            <a href="/admin/agents?page=<%= i %>&search=<%= typeof search !== 'undefined' ? search : '' %>&status=<%= typeof status !== 'undefined' ? status : '' %>"
+               class="join-item btn btn-xs <%= page === i ? 'btn-active bg-blue-600 text-white border-0' : 'btn-ghost' %>">
+              <%= i %>
+            </a>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+</div>
+
+<!-- Modal Quick QR Code Pairing -->
+<dialog id="modal-quick-qr" class="modal">
+  <div class="modal-box bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm text-center">
+    <h3 id="modal-qr-title" class="font-bold text-base text-slate-900 dark:text-white">QR Code Pairing Login</h3>
+    <p id="modal-qr-sub" class="text-xs text-slate-500 mb-3"></p>
+    
+    <div class="p-3 bg-white rounded-2xl border border-slate-200 inline-block shadow my-2">
+      <img id="modal-qr-img" src="" alt="QR Code" class="w-44 h-44 mx-auto" />
+    </div>
+
+    <div class="mt-2 text-[11px] text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 py-1 px-2 rounded">
+      Server: <%= typeof serverUrl !== 'undefined' ? serverUrl : '' %>
+    </div>
+
+    <div class="mt-4 space-y-2">
+      <a id="modal-qr-wa" href="#" target="_blank" class="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-0 w-full text-xs font-semibold gap-1.5 shadow-sm">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.699c.969.585 1.961.918 3.123.918 3.181 0 5.768-2.587 5.768-5.767 0-3.181-2.587-5.765-5.768-5.765zm0 10.373c-1.026 0-1.923-.298-2.738-.81l-.196-.118-1.577.414.421-1.536-.128-.204c-.583-.933-.892-1.898-.891-3.085.001-2.614 2.128-4.741 4.742-4.741 2.613 0 4.741 2.128 4.741 4.741 0 2.614-2.128 4.741-4.742 4.741z"/></svg>
+        <span>Kirim via WhatsApp (wa.me)</span>
+      </a>
+      <button type="button" onclick="document.getElementById('modal-quick-qr').close()" class="btn btn-sm btn-ghost w-full text-xs">Tutup</button>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+
+<script>
+function openQrModal(id, name, username, qrUrl, waLink) {
+  document.getElementById('modal-qr-title').innerText = name;
+  document.getElementById('modal-qr-sub').innerText = username + ' • Scan dari APK Juragan Pulsa';
+  document.getElementById('modal-qr-img').src = qrUrl;
+  const waBtn = document.getElementById('modal-qr-wa');
+  if (waLink) {
+    waBtn.href = waLink;
+    waBtn.style.display = 'inline-flex';
+  } else {
+    waBtn.style.display = 'none';
+  }
+  document.getElementById('modal-quick-qr').showModal();
+}
+</script>
+
+<%- include('../partials/footer') %>

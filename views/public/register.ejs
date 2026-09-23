@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="<%= logo || '/public/images/favicon.png' %>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- DaisyUI & Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #080C14;
+      color: #E2E8F0;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glow-accent {
+      box-shadow: 0 0 35px -5px rgba(59, 130, 246, 0.3);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+  <!-- ── Top Navbar ─────────────────────────────────────────────────────────── -->
+  <header class="sticky top-0 z-50 bg-[#080C14]/90 backdrop-blur-md border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <a href="/" class="flex items-center gap-3 group">
+        <% if (logo) { %>
+          <img src="<%= logo %>" alt="<%= storeName %>" class="w-10 h-10 rounded-xl object-cover shadow-lg border border-slate-700/50" />
+        <% } else { %>
+          <img src="/public/images/logo-brand.jpg" alt="<%= storeName %>" class="w-10 h-10 rounded-xl object-cover shadow-lg border border-slate-700/50 group-hover:scale-105 transition-transform" />
+        <% } %>
+        <div>
+          <div class="text-base font-extrabold text-white tracking-tight flex items-center gap-1.5">
+            <span><%= storeName %></span>
+            <span class="badge badge-xs bg-sky-500 text-white font-bold px-1.5 py-0.5">MITRA</span>
+          </div>
+          <p class="text-[10px] text-slate-400 font-medium hidden sm:block">Pendaftaran Agen & Reseller Resmi</p>
+        </div>
+      </a>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-2.5">
+        <a href="/" class="btn btn-sm btn-ghost text-slate-300 hover:text-white border border-slate-800 text-xs font-semibold gap-1.5">
+          <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+          <span>Etalase Top-Up</span>
+        </a>
+
+        <% if (csWhatsapp) { 
+             const waClean = (csWhatsapp || '').replace(/\D/g, '').replace(/^0/, '62');
+        %>
+          <a href="https://wa.me/<%= waClean %>?text=<%= encodeURIComponent('Halo CS ' + storeName + ', saya ingin bertanya mengenai pendaftaran agen.') %>" target="_blank" rel="noopener" class="btn btn-sm btn-ghost text-emerald-400 hover:bg-emerald-950/30 border border-emerald-900/50 text-xs font-semibold gap-1.5 hidden sm:inline-flex">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.97.587 1.942.898 2.796.898h.005c3.181 0 5.768-2.587 5.768-5.766.001-3.181-2.585-5.785-5.773-5.785zm3.385 8.169c-.141.397-.714.733-1.018.777-.306.046-.701.077-1.127-.061-.734-.238-1.637-.777-2.381-1.521-.744-.744-1.283-1.647-1.521-2.381-.138-.426-.107-.821-.061-1.127.044-.304.38-.877.777-1.018.146-.052.285-.046.398-.015.112.031.25.139.313.266.14.286.478 1.168.521 1.256.043.088.073.19.014.306-.059.116-.118.19-.204.288-.086.098-.182.203-.26.288-.087.095-.178.198-.077.371.101.173.448.74 1.012 1.243.725.646 1.336.847 1.527.942.191.095.304.08.418-.052.114-.132.489-.57.621-.766.132-.196.264-.164.443-.098.179.066 1.137.536 1.332.634.195.098.326.146.374.229.048.083.048.481-.093.878zM12 2C6.477 2 2 6.477 2 12c0 1.891.524 3.66 1.434 5.178L2 22l4.98-1.306C8.423 21.536 10.154 22 12 22c5.523 0 10-6.477 10-10S17.523 2 12 2z"/></svg>
+            <span>CS WhatsApp</span>
+          </a>
+        <% } %>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ── Main Content ────────────────────────────────────────────────────────── -->
+  <main class="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    
+    <!-- Hero Header -->
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-semibold mb-4">
+        <span>🚀 Pendaftaran Otomatis & Langsung Aktif</span>
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-black text-white tracking-tight">
+        Gabung Jadi Agen & Reseller <span class="bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-400 bg-clip-text text-transparent"><%= storeName %></span>
+      </h1>
+      <p class="text-slate-400 text-sm sm:text-base mt-2">
+        Dapatkan harga modal termurah se-Indonesia untuk jualan Pulsa, Paket Data, Token PLN, Top-Up Game, dan PPOB Lengkap 24 Jam.
+      </p>
+    </div>
+
+    <!-- Alert Error jika ada -->
+    <% if (error) { %>
+      <div class="max-w-xl mx-auto mb-8 p-4 rounded-xl bg-red-950/60 border border-red-800/80 text-red-200 flex items-start gap-3 text-sm shadow-lg">
+        <svg class="w-5 h-5 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <div>
+          <span class="font-bold">Gagal Mendaftar:</span> <%= error %>
+        </div>
+      </div>
+    <% } %>
+
+    <% if (!isRegEnabled) { %>
+      <!-- Alert Jika Pendaftaran Ditutup -->
+      <div class="max-w-xl mx-auto text-center p-8 rounded-2xl glass-card border border-amber-800/50">
+        <div class="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto mb-4 text-2xl">
+          🔒
+        </div>
+        <h2 class="text-xl font-bold text-white mb-2">Pendaftaran Mandiri Sedang Ditutup</h2>
+        <p class="text-slate-400 text-sm mb-6">
+          Saat ini pendaftaran agen melalui web sedang dibatasi. Silakan hubungi Customer Service kami untuk dibantu pendaftaran secara manual.
+        </p>
+        <% if (csWhatsapp) { 
+             const waClean = (csWhatsapp || '').replace(/\D/g, '').replace(/^0/, '62');
+        %>
+          <a href="https://wa.me/<%= waClean %>?text=<%= encodeURIComponent('Halo Admin ' + storeName + ', saya ingin mendaftar sebagai agen mitra.') %>" target="_blank" class="btn btn-emerald bg-emerald-600 hover:bg-emerald-500 text-white border-0 font-bold gap-2">
+            💬 Hubungi CS via WhatsApp
+          </a>
+        <% } %>
+      </div>
+    <% } else { %>
+
+      <!-- Grid: Form Pendaftaran (Kiri) & Keuntungan Agen (Kanan) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Kolom Form (7 Kolom) -->
+        <div class="lg:col-span-7 glass-card rounded-2xl p-6 sm:p-8 border border-slate-800/80 shadow-2xl relative overflow-hidden">
+          <div class="absolute -top-24 -right-24 w-48 h-48 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div class="flex items-center justify-between pb-5 mb-6 border-b border-slate-800">
+            <div>
+              <h2 class="text-lg font-extrabold text-white">Formulir Pendaftaran Mitra</h2>
+              <p class="text-xs text-slate-400 mt-0.5">Isi data akun Anda dengan benar untuk langsung aktif.</p>
+            </div>
+            <span class="badge badge-success bg-emerald-500/10 border-emerald-500/30 text-emerald-400 text-xs font-bold py-3 px-3">
+              🟢 Buka 24 Jam
+            </span>
+          </div>
+
+          <form action="/register" method="POST" id="reg-form" class="space-y-4">
+            
+            <!-- Nama Lengkap / Usaha -->
+            <div>
+              <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5" for="name">
+                Nama Lengkap / Nama Konter <span class="text-rose-400">*</span>
+              </label>
+              <div class="relative">
+                <input type="text" id="name" name="name" required placeholder="Contoh: Budi Cell / Ahmad Santoso" value="<%= formData.name || '' %>" class="input input-bordered w-full bg-slate-900/90 border-slate-700 text-white placeholder:text-slate-500 text-sm focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+              </div>
+            </div>
+
+            <!-- Nomor WhatsApp -->
+            <div>
+              <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5" for="phone">
+                Nomor WhatsApp Aktif <span class="text-rose-400">*</span>
+              </label>
+              <div class="relative">
+                <input type="tel" id="phone" name="phone" required placeholder="Contoh: 081234567890" value="<%= formData.phone || '' %>" class="input input-bordered w-full bg-slate-900/90 border-slate-700 text-white placeholder:text-slate-500 text-sm font-mono focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+              </div>
+              <p class="text-[11px] text-slate-400 mt-1">Detail akun & QR Code Login akan otomatis dikirimkan ke nomor WhatsApp ini.</p>
+            </div>
+
+            <!-- Username & Password Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Username -->
+              <div>
+                <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5" for="username">
+                  Username Login <span class="text-rose-400">*</span>
+                </label>
+                <input type="text" id="username" name="username" required placeholder="budi_cell" pattern="[a-zA-Z0-9_]{3,20}" value="<%= formData.username || '' %>" class="input input-bordered w-full bg-slate-900/90 border-slate-700 text-white placeholder:text-slate-500 text-sm font-mono lowercase focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                <p class="text-[10px] text-slate-400 mt-1">3-20 karakter (huruf, angka, _)</p>
+              </div>
+
+              <!-- Password / PIN -->
+              <div>
+                <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5" for="password">
+                  Password / PIN <span class="text-rose-400">*</span>
+                </label>
+                <input type="password" id="password" name="password" required placeholder="Minimal 4 karakter" minlength="4" class="input input-bordered w-full bg-slate-900/90 border-slate-700 text-white placeholder:text-slate-500 text-sm font-mono focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                <p class="text-[10px] text-slate-400 mt-1">Gunakan kombinasi yang aman</p>
+              </div>
+            </div>
+
+            <!-- Alamat / Kota (Opsional) -->
+            <div>
+              <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5" for="address">
+                Kota / Domisili <span class="text-slate-500 font-normal">(Opsional)</span>
+              </label>
+              <input type="text" id="address" name="address" placeholder="Contoh: Surabaya, Jawa Timur" value="<%= formData.address || '' %>" class="input input-bordered w-full bg-slate-900/90 border-slate-700 text-white placeholder:text-slate-500 text-sm focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+            </div>
+
+            <!-- Persetujuan Ketentuan -->
+            <div class="pt-2">
+              <label class="cursor-pointer flex items-start gap-2.5 text-xs text-slate-400">
+                <input type="checkbox" required checked class="checkbox checkbox-sm checkbox-primary bg-slate-900 border-slate-700 mt-0.5" />
+                <span>Saya menyetujui syarat & ketentuan kemitraan agen di <strong class="text-slate-200"><%= storeName %></strong>.</span>
+              </label>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-3">
+              <button type="submit" id="btn-submit" class="btn btn-primary w-full bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white border-0 font-extrabold text-sm shadow-lg shadow-sky-600/30 gap-2 h-12">
+                <span>Daftar Sekarang & Dapatkan QR Login</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              </button>
+            </div>
+
+            <p class="text-center text-[11px] text-slate-500 mt-3">
+              Sudah punya akun agen? Buka aplikasi Android dan langsung login.
+            </p>
+          </form>
+        </div>
+
+        <!-- Kolom Keuntungan & Info (5 Kolom) -->
+        <div class="lg:col-span-5 space-y-4">
+          
+          <!-- Card Fitur 1 -->
+          <div class="glass-card rounded-2xl p-5 border border-slate-800/80 hover:border-sky-500/40 transition-colors">
+            <div class="flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400 flex items-center justify-center shrink-0 text-lg">
+                📷
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-white">Scan QR Code Instant Login</h3>
+                <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                  Setelah mendaftar, langsung dapatkan QR Code Pairing. Cukup scan dari aplikasi Android untuk login otomatis tanpa ketik password.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Fitur 2 -->
+          <div class="glass-card rounded-2xl p-5 border border-slate-800/80 hover:border-emerald-500/40 transition-colors">
+            <div class="flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0 text-lg">
+                💰
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-white">Harga Modal H2H Terendah</h3>
+                <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                  Nikmati margin keuntungan maksimal. Cocok untuk konter fisik, toko online, maupun kebutuhan jualan pribadi.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Fitur 3 -->
+          <div class="glass-card rounded-2xl p-5 border border-slate-800/80 hover:border-indigo-500/40 transition-colors">
+            <div class="flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center shrink-0 text-lg">
+                ⚡
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-white">Deposit Otomatis 24 Jam</h3>
+                <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                  Top-up saldo agen praktis menggunakan QRIS statis & transfer bank dengan verifikasi cepat kapan saja.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Unduh APK Banner -->
+          <div class="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-sky-950 border border-sky-800/50 relative overflow-hidden">
+            <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
+              <span>📱 Aplikasi Android Agen</span>
+              <span class="badge badge-xs bg-sky-500 text-white font-bold">Resmi</span>
+            </h3>
+            <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
+              Transaksi lebih lancar, cetak struk bluetooth, dan cek mutasi saldo langsung dari genggaman.
+            </p>
+            <div class="mt-4">
+              <a href="<%= appDownloadUrl %>" class="btn btn-sm bg-sky-600 hover:bg-sky-500 text-white border-0 text-xs font-bold gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <span>Unduh File APK (.apk)</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    <% } %>
+
+  </main>
+
+  <!-- ── Footer ──────────────────────────────────────────────────────────────── -->
+  <footer class="mt-auto border-t border-slate-800/80 bg-[#06090F] py-6 text-center text-xs text-slate-500">
+    <p>© <%= new Date().getFullYear() %> <strong><%= storeName %></strong> • Powered by <span class="text-sky-400 font-semibold">ALIJAYA NET</span></p>
+  </footer>
+
+  <script>
+    const form = document.getElementById('reg-form');
+    const submitBtn = document.getElementById('btn-submit');
+    if (form && submitBtn) {
+      form.addEventListener('submit', function() {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+          <span class="loading loading-spinner loading-sm"></span>
+          <span>Memproses Pendaftaran Akun...</span>
+        `;
+      });
+    }
+  </script>
+</body>
+</html>

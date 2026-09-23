@@ -1,0 +1,310 @@
+<%- include('../partials/header') %>
+
+<div class="space-y-5">
+
+  <!-- Header & Back Navigation -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <a href="/admin/agents" class="btn btn-sm btn-ghost text-xs gap-1.5 text-slate-500">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        <span>Kembali ke Daftar Agen</span>
+      </a>
+      <div>
+        <h3 class="text-lg lg:text-xl font-bold text-slate-900 dark:text-white tracking-tight"><%= agent.name %></h3>
+        <p class="text-xs text-slate-500 font-mono">@<%= agent.username %> • Reseller ID #<%= agent.id %></p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="document.getElementById('modal-reset-pass').showModal()" class="btn btn-sm bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:border-amber-900 text-xs font-semibold">
+        🔑 Reset Password
+      </button>
+      <form action="/admin/agents/<%= agent.id %>/toggle" method="POST">
+        <button type="submit" class="btn btn-sm <%= agent.is_active ? 'bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 dark:bg-red-950/40 dark:border-red-900' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200' %> text-xs font-semibold">
+          <%= agent.is_active ? 'Nonaktifkan Akun' : 'Aktifkan Akun' %>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- New Agent / Reset Password Banner Alert (If Just Created) -->
+  <% if (typeof newPairing !== 'undefined' && newPairing) { %>
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-5 text-white shadow-lg space-y-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🎉</span>
+          <div>
+            <h4 class="font-bold text-sm lg:text-base">Akun & Kredensial Login Siap Digunakan</h4>
+            <p class="text-xs text-blue-100">Bagikan QR Code atau kirim kredensial langsung ke WhatsApp agen.</p>
+          </div>
+        </div>
+        <span class="px-2.5 py-1 rounded-full bg-white/20 text-[11px] font-semibold">Login 1-Scan APK</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+        <div class="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
+          <span class="text-blue-200 text-[10px] uppercase font-bold block">Server URL</span>
+          <span class="font-mono font-semibold select-all break-all"><%= newPairing.serverUrl %></span>
+        </div>
+        <div class="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
+          <span class="text-blue-200 text-[10px] uppercase font-bold block">Username</span>
+          <span class="font-mono font-bold text-sm select-all"><%= newPairing.username %></span>
+        </div>
+        <div class="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
+          <span class="text-blue-200 text-[10px] uppercase font-bold block">Password</span>
+          <span class="font-mono font-bold text-sm select-all text-amber-300"><%= newPairing.plainPassword %></span>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2 pt-2">
+        <% if (newPairing.waLink) { %>
+          <a href="<%= newPairing.waLink %>" target="_blank" class="btn btn-sm bg-emerald-500 hover:bg-emerald-600 text-white border-0 text-xs font-semibold gap-1.5 shadow">
+            <span>💬 Kirim via WhatsApp (wa.me)</span>
+          </a>
+        <% } %>
+        <form action="/admin/agents/<%= agent.id %>/send-whatsapp-qr" method="POST" class="inline">
+          <input type="hidden" name="password" value="<%= newPairing.plainPassword %>" />
+          <button type="submit" class="btn btn-sm bg-white/20 hover:bg-white/30 text-white border-0 text-xs font-semibold">
+            🤖 Kirim via Baileys Bot Server
+          </button>
+        </form>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Top Section: Profile Info + Saldo + QR Code Pairing Card -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    
+    <!-- Profile & Edit (Col 1) -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500">Informasi Agen & Profil</h4>
+        <span class="text-[11px] text-slate-400"><%= formatDateTime(agent.created_at) %></span>
+      </div>
+      
+      <form action="/admin/agents/<%= agent.id %>/edit" method="POST" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Nama Toko / Agen</label>
+          <input type="text" name="name" value="<%= agent.name %>" class="input-fintech w-full" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Username</label>
+          <input type="text" value="<%= agent.username %>" readonly class="input-fintech w-full bg-slate-100 dark:bg-slate-800 cursor-not-allowed font-mono" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Nomor WhatsApp</label>
+          <input type="text" name="phone" value="<%= agent.phone %>" class="input-fintech w-full font-mono" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Email</label>
+          <input type="email" name="email" value="<%= agent.email || '' %>" class="input-fintech w-full" />
+        </div>
+
+        <div class="flex justify-end pt-2">
+          <button type="submit" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-0 text-xs font-semibold">Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Saldo & Manual Topup (Col 2) -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm flex flex-col justify-between space-y-4">
+      <div>
+        <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500">Saldo Dompet Agen</h4>
+        <div class="text-2xl lg:text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-2 font-mono">
+          <%= formatRupiah(agent.balance || 0) %>
+        </div>
+        <div class="mt-2">
+          <% if (agent.is_active) { %>
+            <span class="badge-status badge-status-success">
+              <span class="dot-pulse dot-pulse-success"></span> Akun Aktif
+            </span>
+          <% } else { %>
+            <span class="badge-status badge-status-failed">
+              <span class="dot-pulse dot-pulse-failed"></span> Akun Nonaktif
+            </span>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-100 dark:border-slate-800 pt-4">
+        <h5 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Top-Up Saldo Manual</h5>
+        <form action="/admin/agents/<%= agent.id %>/topup" method="POST" class="space-y-2.5">
+          <input type="number" name="amount" placeholder="Nominal (contoh: 100000)" required class="input-fintech w-full font-mono text-xs" />
+          <input type="text" name="note" placeholder="Catatan transaksi (opsional)" class="input-fintech w-full text-xs" />
+          <button type="submit" class="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-0 w-full text-xs font-semibold">
+            Tambah Saldo Agen
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- QR Code Pairing & 1-Scan Login (Col 3) -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-blue-200/80 dark:border-blue-900/60 p-5 shadow-sm flex flex-col justify-between space-y-4 bg-gradient-to-b from-blue-50/40 dark:from-blue-950/20 to-transparent">
+      <div>
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+          <h4 class="font-bold text-xs uppercase tracking-wider text-blue-700 dark:text-blue-400 flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+            <span>QR Pairing Login APK</span>
+          </h4>
+          <span class="badge badge-primary badge-xs">1-Scan</span>
+        </div>
+
+        <div class="text-center py-3 flex flex-col items-center justify-center">
+          <div class="p-2 bg-white rounded-xl shadow border border-slate-200 inline-block">
+            <img src="<%= (typeof newPairing !== 'undefined' && newPairing && newPairing.pairingQrDataUrl) ? newPairing.pairingQrDataUrl : pairingQrDataUrl %>" alt="QR Pairing" class="w-36 h-36 mx-auto" />
+          </div>
+          <p class="text-[11px] text-slate-500 mt-2">
+            Scan dari menu login APK <strong><%= appName %></strong>
+          </p>
+          <div class="mt-1 font-mono text-[10px] text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+            Server: <%= serverUrl %>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+        <% if (waShareLink) { %>
+          <a href="<%= (typeof newPairing !== 'undefined' && newPairing && newPairing.waLink) ? newPairing.waLink : waShareLink %>" target="_blank" class="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-0 w-full text-xs font-semibold gap-1.5 shadow-sm">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.699c.969.585 1.961.918 3.123.918 3.181 0 5.768-2.587 5.768-5.767 0-3.181-2.587-5.765-5.768-5.765zm0 10.373c-1.026 0-1.923-.298-2.738-.81l-.196-.118-1.577.414.421-1.536-.128-.204c-.583-.933-.892-1.898-.891-3.085.001-2.614 2.128-4.741 4.742-4.741 2.613 0 4.741 2.128 4.741 4.741 0 2.614-2.128 4.741-4.742 4.741z"/></svg>
+            <span>Kirim via WhatsApp (wa.me)</span>
+          </a>
+        <% } %>
+
+        <form action="/admin/agents/<%= agent.id %>/send-whatsapp-qr" method="POST">
+          <button type="submit" class="btn btn-sm bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:border-blue-900 w-full text-xs font-semibold">
+            🤖 Kirim via Baileys Bot Otomatis
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Recent Transactions & Mutations -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    
+    <!-- Transaksi Terakhir -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500">Transaksi Terakhir</h4>
+        <span class="text-[11px] text-slate-400">20 Trx Terakhir</span>
+      </div>
+
+      <div class="overflow-x-auto max-h-80">
+        <table class="fintech-table">
+          <thead>
+            <tr>
+              <th>Waktu</th>
+              <th>Produk</th>
+              <th>Tujuan</th>
+              <th>Harga</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (transactions && transactions.length > 0) { %>
+              <% transactions.forEach(t => { %>
+                <tr>
+                  <td class="text-[11px] font-mono whitespace-nowrap text-slate-400"><%= formatDateTime(t.created_at) %></td>
+                  <td class="text-xs font-medium max-w-[120px] truncate text-slate-800 dark:text-slate-200" title="<%= t.product_name %>"><%= t.product_name %></td>
+                  <td class="text-[11px] font-mono"><%= t.target %></td>
+                  <td class="text-xs font-bold font-mono text-slate-900 dark:text-white"><%= formatRupiah(t.price_sell) %></td>
+                  <td>
+                    <% if (t.status === 'success') { %>
+                      <span class="badge-status badge-status-success text-[10px] py-0.5 px-1.5">Sukses</span>
+                    <% } else if (t.status === 'pending') { %>
+                      <span class="badge-status badge-status-pending text-[10px] py-0.5 px-1.5">Pending</span>
+                    <% } else { %>
+                      <span class="badge-status badge-status-failed text-[10px] py-0.5 px-1.5">Gagal</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr><td colspan="5" class="text-center py-6 text-xs text-slate-400">Belum ada transaksi.</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Riwayat Mutasi -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500">Mutasi Saldo Dompet</h4>
+        <a href="/admin/agents/<%= agent.id %>/mutations" class="text-xs text-blue-600 hover:underline font-semibold">Semua &rarr;</a>
+      </div>
+
+      <div class="overflow-x-auto max-h-80">
+        <table class="fintech-table">
+          <thead>
+            <tr>
+              <th>Waktu</th>
+              <th>Tipe</th>
+              <th>Nominal</th>
+              <th>Sisa Saldo</th>
+              <th>Keterangan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (mutations && mutations.length > 0) { %>
+              <% mutations.forEach(m => { %>
+                <tr>
+                  <td class="text-[11px] font-mono whitespace-nowrap text-slate-400"><%= formatDateTime(m.created_at) %></td>
+                  <td>
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold <%= m.type === 'deposit' || m.type === 'refund' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400' : 'bg-red-50 text-red-700 dark:bg-red-950/50 dark:text-red-400' %> uppercase">
+                      <%= m.type %>
+                    </span>
+                  </td>
+                  <td class="text-xs font-bold font-mono <%= m.type === 'deposit' || m.type === 'refund' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400' %>">
+                    <%= m.type === 'deposit' || m.type === 'refund' ? '+' : '-' %><%= formatRupiah(m.amount) %>
+                  </td>
+                  <td class="text-xs font-mono text-slate-600 dark:text-slate-300"><%= formatRupiah(m.balance_after) %></td>
+                  <td class="text-xs text-slate-500 max-w-[120px] truncate"><%= m.notes || '-' %></td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr><td colspan="5" class="text-center py-6 text-xs text-slate-400">Belum ada mutasi saldo.</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Modal Reset Password & Kirim QR Baru -->
+<dialog id="modal-reset-pass" class="modal">
+  <div class="modal-box bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md">
+    <h3 class="font-bold text-base text-slate-900 dark:text-white mb-2">🔑 Reset Password Akun Agen</h3>
+    <p class="text-xs text-slate-500 mb-4">Setel password baru untuk akun <strong><%= agent.name %></strong> (@<%= agent.username %>). QR Code pairing baru akan dibuat otomatis.</p>
+    
+    <form action="/admin/agents/<%= agent.id %>/reset-password" method="POST" class="space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Password Baru *</label>
+        <input type="text" name="new_password" required minlength="4" placeholder="Masukkan password baru..." class="input-fintech w-full font-mono" />
+      </div>
+
+      <div class="flex items-center gap-2">
+        <input type="checkbox" name="send_whatsapp" value="1" id="cb-send-wa" checked class="checkbox checkbox-primary checkbox-sm" />
+        <label for="cb-send-wa" class="text-xs text-slate-600 dark:text-slate-300 cursor-pointer">
+          Kirim password baru & QR Code langsung ke WhatsApp (<%= agent.phone %>)
+        </label>
+      </div>
+
+      <div class="modal-action">
+        <button type="button" onclick="document.getElementById('modal-reset-pass').close()" class="btn btn-sm btn-ghost text-xs">Batal</button>
+        <button type="submit" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-0 text-xs font-semibold">Simpan & Buat QR</button>
+      </div>
+    </form>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+
+<%- include('../partials/footer') %>

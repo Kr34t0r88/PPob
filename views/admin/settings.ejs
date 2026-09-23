@@ -1,0 +1,748 @@
+<%- include('../partials/header') %>
+
+<div class="max-w-5xl mx-auto space-y-5">
+
+  <div>
+    <h3 class="text-lg lg:text-xl font-bold text-slate-900 dark:text-white tracking-tight">Pengaturan Sistem & Integrasi</h3>
+    <p class="text-xs text-slate-500">Konfigurasi nama server, kredensial Digiflazz, WhatsApp bot Baileys, dan ganti password administrator.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    
+    <!-- Main Settings Form (2 Cols) -->
+    <div class="lg:col-span-2 space-y-5">
+      
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 lg:p-6 shadow-sm space-y-4">
+        <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500">Informasi Brand & Server</h4>
+        
+        <form action="/admin/settings" method="POST" class="space-y-4">
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Nama Brand / Server</label>
+              <input type="text" name="app_name" value="<%= settings.app_name || 'Juragan Pulsa' %>" required class="input-fintech w-full" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">URL Server / Domain (Untuk QR APK & WA)</label>
+              <input type="text" name="app_url" value="<%= settings.app_url || '' %>" placeholder="http://192.168.1.100:5000 atau https://pulsa.domain.com" class="input-fintech w-full font-mono text-xs" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">No. WhatsApp CS / Bantuan</label>
+              <input type="text" name="app_phone" value="<%= settings.app_phone || '' %>" placeholder="081234567890" class="input-fintech w-full font-mono" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Default Margin Agen (Rp)</label>
+              <input type="number" name="digiflazz_markup" value="<%= settings.digiflazz_markup || '2000' %>" class="input-fintech w-full font-mono" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Alamat / Informasi Tambahan</label>
+            <textarea name="app_address" rows="2" class="input-fintech w-full h-auto py-2"><%= settings.app_address || '' %></textarea>
+          </div>
+
+          <!-- ── Section: Kustomisasi Web Storefront Publik ──────────────────── -->
+          <div class="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3.5">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                  <span>🎨 Kustomisasi Web Publik &amp; Storefront</span>
+                  <span class="badge badge-xs bg-blue-600 text-white font-mono text-[9px]">UniPin Style</span>
+                </h4>
+                <p class="text-[11px] text-slate-400">Atur nama toko, slogan, tema, pengumuman, dan margin harga untuk pembeli langsung tanpa akun.</p>
+              </div>
+              <div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" name="public_store_enabled" value="1" <%= (settings.public_store_enabled === '1' || settings.public_store_enabled === 1 || settings.public_store_enabled === true) ? 'checked' : '' %> class="checkbox checkbox-xs rounded checkbox-primary" />
+                  <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Aktifkan Store</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Nama Toko Publik</label>
+                <input type="text" name="public_store_name" value="<%= settings.public_store_name || settings.app_name || 'Juragan Topup' %>" class="input-fintech w-full" placeholder="Juragan Topup" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Default Margin Publik (+Rp)</label>
+                <input type="number" name="public_store_markup" value="<%= settings.public_store_markup || '3000' %>" class="input-fintech w-full font-mono text-emerald-600 dark:text-emerald-400 font-bold" />
+                <span class="text-[10px] text-slate-400">Keuntungan per produk di web publik (Harga = Modal + Margin Publik).</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Slogan / Tagline Toko</label>
+              <input type="text" name="public_store_tagline" value="<%= settings.public_store_tagline || 'Top Up Game, Pulsa & Token PLN 24 Jam Otomatis' %>" class="input-fintech w-full text-xs" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Running Text / Pengumuman Promo Marquee</label>
+              <input type="text" name="public_store_announcement" value="<%= settings.public_store_announcement || '' %>" placeholder="⚡ Promo Top-Up Diamond & Pulsa Diskon Spesial! Layanan 24 Jam Otomatis." class="input-fintech w-full text-xs" />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">WhatsApp CS Toko</label>
+                <input type="text" name="public_cs_whatsapp" value="<%= settings.public_cs_whatsapp || '' %>" placeholder="0819xxxxxxxx" class="input-fintech w-full font-mono text-xs" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Telegram CS (Opsional)</label>
+                <input type="text" name="public_cs_telegram" value="<%= settings.public_cs_telegram || '' %>" placeholder="@username" class="input-fintech w-full font-mono text-xs" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Batas QRIS (Menit)</label>
+                <input type="number" name="public_qris_expiry_minutes" value="<%= settings.public_qris_expiry_minutes || '15' %>" class="input-fintech w-full font-mono text-xs" />
+              </div>
+            </div>
+
+            <div class="space-y-2 pt-1">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" name="public_show_apk_download" value="1" <%= (settings.public_show_apk_download === '1' || settings.public_show_apk_download === 1 || settings.public_show_apk_download === true) ? 'checked' : '' %> class="checkbox checkbox-xs rounded checkbox-primary" />
+                <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Tampilkan Tombol Download APK Agen di Header &amp; Footer</span>
+              </label>
+
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" name="public_agent_registration_enabled" value="1" <%= (settings.public_agent_registration_enabled === '1' || settings.public_agent_registration_enabled === 1 || settings.public_agent_registration_enabled === true || settings.public_agent_registration_enabled === undefined) ? 'checked' : '' %> class="checkbox checkbox-xs rounded checkbox-primary" />
+                <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Izinkan Pendaftaran Agen Mandiri dari Web Publik (<code class="text-sky-500 font-mono text-[10px]">/register</code>)</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100 dark:border-slate-800">
+            <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500 mb-3">Kredensial Digiflazz H2H</h4>
+
+            <div class="space-y-3.5">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Username Digiflazz</label>
+                  <input type="text" name="digiflazz_username" value="<%= settings.digiflazz_username || '' %>" placeholder="username" class="input-fintech w-full font-mono" />
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">API Key Digiflazz</label>
+                  <input type="password" name="digiflazz_api_key" value="<%= settings.digiflazz_api_key || '' %>" placeholder="dev-xxxx / prod-xxxx" class="input-fintech w-full font-mono" />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Webhook Secret Digiflazz (HMAC-SHA1)</label>
+                <input type="password" name="digiflazz_webhook_secret" value="<%= settings.digiflazz_webhook_secret || '' %>" placeholder="Secret string" class="input-fintech w-full font-mono" />
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-3.5">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500">Integrasi QRIS Statis to Dynamic</h4>
+                <p class="text-[11px] text-slate-400">Konversi QRIS Statis merchant (DANA/BCA/Bank) menjadi QRIS Dinamis ber-nominal unik otomatis.</p>
+              </div>
+              <div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" name="qris_static_enabled" value="1" <%= (settings.qris_static_enabled === '1' || settings.qris_static_enabled === 1 || settings.qris_static_enabled === true || settings.qris_static_enabled === 'true') ? 'checked' : '' %> class="checkbox checkbox-xs rounded checkbox-primary" />
+                  <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Aktifkan QRIS</span>
+                </label>
+              </div>
+            </div>
+
+            <input type="hidden" name="qris_image_path" id="qris_image_path_input" value="<%= settings.qris_image_path || '' %>" />
+
+            <!-- Direct QRIS Image Upload Zone -->
+            <div class="space-y-2">
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Unggah Gambar / File QRIS Statis</label>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="sm:col-span-2">
+                  <label for="qris_file_input" class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 rounded-xl cursor-pointer bg-slate-50/60 dark:bg-slate-800/40 hover:bg-blue-50/40 dark:hover:bg-blue-900/20 transition-all text-center group">
+                    <input type="file" id="qris_file_input" accept="image/*" class="hidden" onchange="handleQrisImageUpload(this)" />
+                    <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform mb-2">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <span class="text-xs font-semibold text-slate-700 dark:text-slate-200">Klik / Tarik Gambar QRIS ke Sini</span>
+                    <span class="text-[10px] text-slate-400 mt-0.5">Format: JPG, PNG, WEBP. Payload EMVCo diekstrak otomatis &amp; instan.</span>
+                  </label>
+                </div>
+
+                <!-- QR Image Preview / Thumbnail Box -->
+                <div id="qris_thumb_container" class="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200/80 dark:border-slate-700 flex flex-col items-center justify-center text-center">
+                  <% if (settings.qris_image_path) { %>
+                    <img id="qris_thumb_img" src="<%= settings.qris_image_path %>" alt="QRIS Merchant" class="w-20 h-20 object-contain rounded-lg border border-slate-200 shadow-xs mb-1" />
+                    <span class="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">Gambar QRIS Tersimpan</span>
+                  <% } else { %>
+                    <div id="qris_thumb_placeholder" class="space-y-1">
+                      <span class="text-xl">🖼️</span>
+                      <p class="text-[10px] text-slate-400">Belum ada gambar QRIS yang diunggah.</p>
+                    </div>
+                  <% } %>
+                </div>
+              </div>
+
+              <!-- Upload Decode Status Indicator -->
+              <div id="qris_decode_status" style="display: none;" class="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs flex items-center justify-between">
+                <span id="qris_decode_status_text">✅ Gambar QRIS berhasil di-scan &amp; payload terisi otomatis!</span>
+                <button type="button" onclick="testQrisPreview()" class="font-bold underline text-emerald-800 dark:text-emerald-200">Lihat QR Dinamis</button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Payload EMVCo QRIS Statis (String)</label>
+              <textarea name="qris_static_payload" id="qris_payload_input" rows="3" placeholder="0002010102112657...6304XXXX" class="input-fintech w-full h-auto py-2 font-mono text-[11px]"><%= settings.qris_static_payload || '' %></textarea>
+              <div class="flex items-center justify-between mt-1.5">
+                <span class="text-[10px] text-slate-400">Payload string EMVCo (dihasilkan otomatis saat upload gambar atau disalin manual).</span>
+                <button type="button" onclick="testQrisPreview()" class="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                  <span>Uji Generate Dynamic QRIS</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-3.5">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500">Pembaruan Aplikasi Android (In-App Auto Update)</h4>
+                <p class="text-[11px] text-slate-400">Konfigurasi versi APK terbaru agar agen dapat mengunduh dan memasang update otomatis dari server.</p>
+              </div>
+              <div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" name="app_force_update" value="1" <%= (settings.app_force_update === '1' || settings.app_force_update === 1 || settings.app_force_update === true) ? 'checked' : '' %> class="checkbox checkbox-xs rounded checkbox-primary" />
+                  <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Wajibkan Update</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Version Code (Build)</label>
+                <input type="number" name="app_version_code" value="<%= settings.app_version_code || '1' %>" class="input-fintech w-full font-mono text-xs" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Version Name (Versi)</label>
+                <input type="text" name="app_version_name" value="<%= settings.app_version_name || '1.0.0' %>" placeholder="1.0.0" class="input-fintech w-full font-mono text-xs" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">File Path / URL Download</label>
+                <input type="text" name="app_download_url" value="<%= settings.app_download_url || '/downloads/juragan-pulsa.apk' %>" class="input-fintech w-full font-mono text-xs" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Catatan Rilis (Release Notes)</label>
+              <textarea name="app_release_notes" rows="2" placeholder="• Fitur baru...&#10;• Perbaikan bug..." class="input-fintech w-full h-auto py-2 text-xs"><%= settings.app_release_notes || '• Fitur Scan QR Code Akun & WhatsApp Bot Onboarding\n• Cetak struk kasir Bluetooth Thermal Printer 58mm/80mm\n• Pembaruan aplikasi otomatis dari server\n• Gateway verifikasi deposit otomatis pengganti MacroDroid' %></textarea>
+              <p class="text-[10px] text-slate-400 mt-1">Letakkan file APK rilis di folder server: <code>public/downloads/juragan-pulsa.apk</code>.</p>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-3.5">
+            <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500 mb-2">WhatsApp Bot & Akses Admin</h4>
+
+            <div>
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" name="whatsapp_enabled" value="1" <%= (settings.whatsapp_enabled === '1' || settings.whatsapp_enabled === 1 || settings.whatsapp_enabled === true) ? 'checked' : '' %> class="checkbox checkbox-xs rounded checkbox-primary" />
+                <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Aktifkan Notifikasi & Transaksi Bot WhatsApp (Baileys)</span>
+              </label>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Nomor WhatsApp Administrator (Koma terpisah)</label>
+              <input type="text" name="whatsapp_admin_numbers" value="<%= settings.whatsapp_admin_numbers || '' %>" placeholder="081234567890, 08987654321" class="input-fintech w-full font-mono text-xs" />
+              <p class="text-[10px] text-slate-400 mt-1">Nomor HP yang memiliki hak akses menjalankan perintah admin via WhatsApp (contoh: <code>topup</code>, <code>saldodigi</code>, <code>appdeposit</code>).</p>
+            </div>
+          </div>
+
+          <!-- ── Section: Telegram Bot & Web Live Chat ────────────────────────── -->
+          <div class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-3.5">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                  <span>✈️ Integrasi Bot Telegram &amp; Web Live Chat</span>
+                  <span class="badge badge-xs bg-sky-600 text-white font-mono text-[9px]">Live Chat Bridge</span>
+                </h4>
+                <p class="text-[11px] text-slate-400">Jembatan chat dua arah: Pengunjung web chat langsung $\leftrightarrow$ Admin membalas via aplikasi Telegram.</p>
+              </div>
+              <div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" name="telegram_livechat_enabled" value="1" <%= (settings.telegram_livechat_enabled === '1' || settings.telegram_livechat_enabled === 1 || settings.telegram_livechat_enabled === true || settings.telegram_livechat_enabled === 'true') ? 'checked' : '' %> class="checkbox checkbox-xs rounded checkbox-primary" />
+                  <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Aktifkan Live Chat</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Telegram Bot Token</label>
+                <input type="password" name="telegram_bot_token" id="telegram_bot_token_input" value="<%= settings.telegram_bot_token || '' %>" placeholder="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ..." class="input-fintech w-full font-mono text-xs" />
+                <p class="text-[10px] text-slate-400 mt-1">Dapatkan token dari <a href="https://t.me/BotFather" target="_blank" class="text-blue-500 underline font-semibold">@BotFather</a> di Telegram.</p>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Telegram Chat ID / Group ID</label>
+                <input type="text" name="telegram_chat_id" id="telegram_chat_id_input" value="<%= settings.telegram_chat_id || '' %>" placeholder="Contoh: 123456789 atau -1001234567890" class="input-fintech w-full font-mono text-xs" />
+                <p class="text-[10px] text-slate-400 mt-1">ID akun Anda atau ID grup CS (cek via bot <a href="https://t.me/userinfobot" target="_blank" class="text-blue-500 underline font-semibold">@userinfobot</a>).</p>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Pesan Sambutan Otomatis (Welcome Message)</label>
+              <input type="text" name="livechat_welcome_message" value="<%= settings.livechat_welcome_message || 'Halo! Selamat datang di Juragan Pulsa. Ada yang bisa kami bantu?' %>" class="input-fintech w-full text-xs" />
+              <p class="text-[10px] text-slate-400 mt-1">Pesan otomatis yang langsung muncul pertama kali saat pengunjung membuka widget live chat.</p>
+            </div>
+
+            <div class="p-3 bg-sky-50/50 dark:bg-sky-950/20 border border-sky-200/70 dark:border-sky-900/40 rounded-xl flex items-center justify-between">
+              <div class="text-[11px] text-slate-600 dark:text-slate-300">
+                <span class="font-semibold text-sky-700 dark:text-sky-300">💡 Cara Kerja:</span> Pesan dari pengunjung web langsung masuk ke Telegram Admin. Admin cukup tekan <b>Reply (Balas)</b> di Telegram, dan balasan otomatis muncul di layar web pengunjung secara real-time!
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <div>
+              <button type="button" onclick="document.getElementById('modal-test-telegram').showModal()" class="btn btn-sm btn-outline btn-info text-xs font-semibold gap-1">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.3-.616.3l.204-3.041 5.54-5.008c.241-.213-.054-.333-.373-.12l-6.85 4.314-2.95-.923c-.642-.202-.654-.64.135-.95l11.536-4.446c.535-.195 1.002.128.874.902z"/></svg>
+                <span>Uji Kirim Pesan Telegram</span>
+              </button>
+            </div>
+            <button type="submit" class="btn btn-sm bg-slate-900 hover:bg-slate-800 text-white border-0 font-semibold px-6 shadow-sm">
+              Simpan Pengaturan
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- QRIS Test Preview Box (Hidden by default, shown on test click) -->
+      <div id="qris-preview-modal" style="display: none;" class="bg-white dark:bg-slate-900 rounded-2xl border border-blue-200 dark:border-blue-900/50 p-5 shadow-sm space-y-3 animate-fade-in">
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="badge-status badge-status-success">Preview QRIS Dinamis</span>
+            <span class="text-xs font-bold text-slate-800 dark:text-slate-100" id="qris-preview-nominal">Rp 50.125</span>
+          </div>
+          <button type="button" onclick="document.getElementById('qris-preview-modal').style.display='none'" class="text-slate-400 hover:text-slate-600 text-xs font-bold">&times; Tutup</button>
+        </div>
+        <div class="flex flex-col sm:flex-row items-center gap-4">
+          <div id="qris-preview-img-box" class="p-2 bg-white rounded-xl border border-slate-200 shrink-0">
+            <!-- Dynamic QR Image -->
+          </div>
+          <div class="space-y-1.5 text-xs">
+            <p class="text-slate-600 dark:text-slate-300 font-medium">✅ QRIS Dinamis Berhasil Dihasilkan!</p>
+            <p class="text-[11px] text-slate-500">Payload dynamic:</p>
+            <div class="p-2 bg-slate-50 dark:bg-slate-800/60 rounded border border-slate-200 dark:border-slate-700 font-mono text-[10px] break-all max-h-20 overflow-y-auto" id="qris-preview-payload"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Sidebar (Password & WhatsApp Status) -->
+    <div class="space-y-5">
+      
+      <!-- WhatsApp Baileys Bot Card -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+          <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500">WhatsApp Gateway (Baileys)</h4>
+          <span id="wa-poll-indicator" class="text-[10px] text-slate-400 font-mono">Live Polling</span>
+        </div>
+        
+        <!-- Status Indicator Box -->
+        <div id="wa-status-box" class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+          <div>
+            <span class="text-xs font-medium text-slate-600 dark:text-slate-300">Status Bot:</span>
+            <p id="wa-status-detail" class="text-[11px] text-slate-400 mt-0.5">Mengecek koneksi...</p>
+          </div>
+          <div id="wa-status-badge">
+            <span class="badge-status badge-status-pending">
+              <span class="dot-pulse dot-pulse-pending"></span> Mengecek...
+            </span>
+          </div>
+        </div>
+
+        <!-- Live QR Code Container (Auto-updates via polling) -->
+        <div id="wa-qr-section" style="display: none;" class="p-4 bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 text-center space-y-2.5 shadow-sm">
+          <div class="flex items-center justify-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
+            <svg class="w-4 h-4 text-blue-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+            <span>Pindai QR Code WhatsApp</span>
+          </div>
+          <p class="text-[11px] text-slate-500">Buka WhatsApp &rarr; <b>Perangkat Tertaut</b> &rarr; <b>Tautkan Perangkat</b></p>
+          <div id="wa-qr-img-wrapper" class="flex justify-center p-2 bg-white rounded-lg inline-block mx-auto border border-slate-200">
+            <!-- Dynamic QR Image Injected Here -->
+            <div class="w-48 h-48 flex items-center justify-center text-xs text-slate-400">
+              Menyiapkan QR Code...
+            </div>
+          </div>
+          <p class="text-[10px] text-slate-400 font-mono">QR Code akan diperbarui secara otomatis.</p>
+        </div>
+
+        <!-- Connected Info Section -->
+        <div id="wa-info-section" style="display: none;" class="p-3 bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-900/40 rounded-xl text-xs space-y-1">
+          <div class="flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-300">
+            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>WhatsApp Bot Aktif</span>
+          </div>
+          <p class="text-slate-600 dark:text-slate-300 text-[11px]">Akun Terhubung: <strong id="wa-user-phone" class="font-mono text-slate-900 dark:text-white">-</strong></p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="space-y-2 pt-1">
+          <form action="/admin/settings/whatsapp/start" method="POST">
+            <button type="submit" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-0 w-full text-xs font-semibold gap-1.5 shadow-sm">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+              <span>Hubungkan / Generate QR Baru</span>
+            </button>
+          </form>
+
+          <form action="/admin/settings/whatsapp/test" method="POST">
+            <button type="submit" class="btn btn-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 w-full text-xs font-semibold gap-1.5 shadow-sm">
+              <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+              <span>Kirim Test Notifikasi WA</span>
+            </button>
+          </form>
+
+          <form action="/admin/settings/whatsapp/reset" method="POST" onsubmit="return confirm('Hapus sesi WhatsApp dan reset pairing? Anda harus scan QR ulang setelah ini.')">
+            <button type="submit" class="btn btn-sm btn-ghost text-red-500 hover:bg-red-50 w-full text-xs font-semibold gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              <span>Reset Sesi / Hapus Auth</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Change Admin Password Card -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-4">
+        <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500">Ganti Password Administrator</h4>
+        
+        <form action="/admin/settings/password" method="POST" class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Password Lama</label>
+            <input type="password" name="old_password" required class="input-fintech w-full" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Password Baru</label>
+            <input type="password" name="new_password" required class="input-fintech w-full" placeholder="Minimal 6 karakter" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Konfirmasi Password</label>
+            <input type="password" name="confirm_password" required class="input-fintech w-full" />
+          </div>
+
+          <button type="submit" class="btn btn-sm bg-slate-900 hover:bg-slate-800 text-white border-0 w-full text-xs font-semibold mt-2">
+            Perbarui Password
+          </button>
+        </form>
+      </div>
+
+      <!-- WhatsApp Bot Command Cheatsheet Card -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+          <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500">Panduan Perintah Bot WA</h4>
+          <span class="badge-status badge-status-success">Bot 24 Jam</span>
+        </div>
+        
+        <div class="space-y-3 text-xs">
+          <!-- Admin Commands -->
+          <div>
+            <span class="font-bold text-[11px] text-blue-600 dark:text-blue-400 uppercase tracking-wider block mb-1">Perintah Khusus Admin:</span>
+            <div class="space-y-1 font-mono text-[11px] text-slate-600 dark:text-slate-300">
+              <div class="p-1.5 bg-slate-50 dark:bg-slate-800/60 rounded flex items-center justify-between">
+                <span><code>saldodigi</code></span>
+                <span class="text-[10px] text-slate-400">Cek saldo Digiflazz</span>
+              </div>
+              <div class="p-1.5 bg-slate-50 dark:bg-slate-800/60 rounded flex items-center justify-between">
+                <span><code>topup budi 50000</code></span>
+                <span class="text-[10px] text-slate-400">Top up saldo agen</span>
+              </div>
+              <div class="p-1.5 bg-slate-50 dark:bg-slate-800/60 rounded flex items-center justify-between">
+                <span><code>appdeposit DEP-xxx</code></span>
+                <span class="text-[10px] text-slate-400">Approve deposit</span>
+              </div>
+              <div class="p-1.5 bg-slate-50 dark:bg-slate-800/60 rounded flex items-center justify-between">
+                <span><code>ringkasan</code></span>
+                <span class="text-[10px] text-slate-400">Rekap omset harian</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Agent Commands -->
+          <div>
+            <span class="font-bold text-[11px] text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block mb-1">Perintah Agen Pulsa:</span>
+            <div class="space-y-1 font-mono text-[11px] text-slate-600 dark:text-slate-300">
+              <div class="p-1.5 bg-slate-50 dark:bg-slate-800/60 rounded flex items-center justify-between">
+                <span><code>saldo</code></span>
+                <span class="text-[10px] text-slate-400">Cek saldo akun</span>
+              </div>
+              <div class="p-1.5 bg-slate-50 dark:bg-slate-800/60 rounded flex items-center justify-between">
+                <span><code>pulsa TSEL10 0812xxx</code></span>
+                <span class="text-[10px] text-slate-400">Beli pulsa/PLN</span>
+              </div>
+              <div class="p-1.5 bg-slate-50 dark:bg-slate-800/60 rounded flex items-center justify-between">
+                <span><code>deposit 50000</code></span>
+                <span class="text-[10px] text-slate-400">Tiket + QRIS WA</span>
+              </div>
+              <div class="p-1.5 bg-slate-50 dark:bg-slate-800/60 rounded flex items-center justify-between">
+                <span><code>harga tsel</code></span>
+                <span class="text-[10px] text-slate-400">Cek harga produk</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- jsQR for client-side QRIS image parsing -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+
+<!-- Realtime WhatsApp Polling & QRIS Preview & Image Upload Script -->
+<script>
+  let lastWaQr = '';
+
+  // Handle Client-side QRIS Image Upload & EMVCo Decoding
+  async function handleQrisImageUpload(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+
+    const statusBox = document.getElementById('qris_decode_status');
+    const statusText = document.getElementById('qris_decode_status_text');
+    const thumbContainer = document.getElementById('qris_thumb_container');
+
+    statusBox.style.display = 'flex';
+    statusText.innerText = '🔍 Membaca & memproses gambar QRIS...';
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = async function() {
+        // Try decoding with original and scaled sizes if needed
+        let decodedPayload = decodeQrFromImage(img);
+
+        if (!decodedPayload) {
+          // Retry with resized canvas for high-resolution camera photos
+          decodedPayload = decodeQrFromImageResized(img, 1000);
+        }
+
+        if (decodedPayload) {
+          document.getElementById('qris_payload_input').value = decodedPayload;
+          statusBox.className = 'p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs flex items-center justify-between';
+          statusText.innerText = '✅ Payload EMVCo QRIS berhasil diekstrak & diisi otomatis!';
+          
+          // Update preview thumbnail
+          thumbContainer.innerHTML = `
+            <img src="${e.target.result}" alt="QRIS Merchant" class="w-20 h-20 object-contain rounded-lg border border-slate-200 shadow-xs mb-1" />
+            <span class="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">QRIS Terdeteksi</span>
+          `;
+
+          // Upload image to server for persistent storage
+          uploadQrisImageToServer(file);
+
+          // Automatically test and preview dynamic QRIS
+          setTimeout(() => testQrisPreview(), 300);
+        } else {
+          statusBox.className = 'p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 text-amber-700 dark:text-amber-300 text-xs flex items-center justify-between';
+          statusText.innerText = '⚠️ QR Code tidak terdeteksi jelas pada gambar. Pastikan gambar tidak blur atau isi teks payload manual.';
+          
+          thumbContainer.innerHTML = `
+            <img src="${e.target.result}" alt="QRIS Merchant" class="w-20 h-20 object-contain rounded-lg border border-amber-200 shadow-xs mb-1" />
+            <span class="text-[10px] font-medium text-amber-600 dark:text-amber-400">Cek Manual</span>
+          `;
+        }
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function decodeQrFromImage(img) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+      inversionAttempts: 'attemptBoth'
+    });
+    return code ? code.data : null;
+  }
+
+  function decodeQrFromImageResized(img, maxDimension) {
+    let width = img.width;
+    let height = img.height;
+    if (width > maxDimension || height > maxDimension) {
+      if (width > height) {
+        height = Math.round((height * maxDimension) / width);
+        width = maxDimension;
+      } else {
+        width = Math.round((width * maxDimension) / height);
+        height = maxDimension;
+      }
+    }
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = width;
+    canvas.height = height;
+    ctx.drawImage(img, 0, 0, width, height);
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+      inversionAttempts: 'attemptBoth'
+    });
+    return code ? code.data : null;
+  }
+
+  async function uploadQrisImageToServer(file) {
+    try {
+      const formData = new FormData();
+      formData.append('qris_image', file);
+
+      const res = await fetch('/admin/settings/qris/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json();
+      if (data.success && data.filePath) {
+        document.getElementById('qris_image_path_input').value = data.filePath;
+      }
+    } catch (e) {
+      console.warn('[QRIS Upload] Background upload notice:', e.message);
+    }
+  }
+
+  async function pollWhatsAppStatus() {
+    try {
+      const res = await fetch('/admin/settings/whatsapp/status');
+      if (!res.ok) return;
+      const data = await res.json();
+      
+      const badgeEl = document.getElementById('wa-status-badge');
+      const detailEl = document.getElementById('wa-status-detail');
+      const qrSection = document.getElementById('wa-qr-section');
+      const qrWrapper = document.getElementById('wa-qr-img-wrapper');
+      const infoSection = document.getElementById('wa-info-section');
+      const userPhone = document.getElementById('wa-user-phone');
+
+      const conn = data.connection || data.status;
+
+      if (conn === 'open') {
+        badgeEl.innerHTML = '<span class="badge-status badge-status-success"><span class="dot-pulse dot-pulse-success"></span> Terhubung</span>';
+        detailEl.innerText = 'Bot aktif & siap memproses transaksi via WhatsApp';
+        qrSection.style.display = 'none';
+        infoSection.style.display = 'block';
+        if (data.user && data.user.id) {
+          const phone = data.user.id.split(':')[0];
+          userPhone.innerText = '+' + phone + (data.user.name ? ' (' + data.user.name + ')' : '');
+        } else {
+          userPhone.innerText = 'Bot Online';
+        }
+      } else if (conn === 'qr') {
+        badgeEl.innerHTML = '<span class="badge-status badge-status-pending"><span class="dot-pulse dot-pulse-pending"></span> Perlu Scan QR</span>';
+        detailEl.innerText = 'Silakan scan QR Code dengan WhatsApp Anda';
+        qrSection.style.display = 'block';
+        infoSection.style.display = 'none';
+
+        if (data.qrImage && data.qr !== lastWaQr) {
+          lastWaQr = data.qr;
+          qrWrapper.innerHTML = `<img src="${data.qrImage}" alt="Scan WhatsApp QR" class="w-48 h-48 rounded-lg shadow-xs" />`;
+        }
+      } else if (conn === 'connecting') {
+        badgeEl.innerHTML = '<span class="badge-status badge-status-pending"><span class="dot-pulse dot-pulse-pending"></span> Menghubungkan...</span>';
+        detailEl.innerText = 'Sedang menyinkronkan koneksi WhatsApp...';
+        qrSection.style.display = 'none';
+        infoSection.style.display = 'none';
+      } else {
+        badgeEl.innerHTML = '<span class="badge-status badge-status-failed"><span class="dot-pulse dot-pulse-failed"></span> Terputus</span>';
+        detailEl.innerText = 'Bot offline. Klik Hubungkan untuk scan QR';
+        qrSection.style.display = 'none';
+        infoSection.style.display = 'none';
+      }
+    } catch (e) {
+      console.error('[WA Polling] Error:', e);
+    }
+  }
+
+  // Poll immediately and every 3 seconds
+  pollWhatsAppStatus();
+  setInterval(pollWhatsAppStatus, 3000);
+
+  // Test Generate QRIS Preview
+  async function testQrisPreview() {
+    const payload = document.getElementById('qris_payload_input').value.trim();
+    if (!payload) {
+      alert('Silakan isi string Payload QRIS Statis atau unggah gambar QRIS terlebih dahulu!');
+      return;
+    }
+
+    try {
+      const res = await fetch('/admin/settings/qris/preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payload, amount: 50125 })
+      });
+
+      const data = await res.json();
+      if (!data.success) {
+        alert('Gagal menghasilkan QRIS: ' + (data.error || 'Payload tidak valid'));
+        return;
+      }
+
+      document.getElementById('qris-preview-nominal').innerText = 'Rp ' + Number(data.amount).toLocaleString('id-ID');
+      document.getElementById('qris-preview-img-box').innerHTML = `<img src="${data.dataUrl}" alt="Preview Dynamic QRIS" class="w-40 h-40 rounded-lg shadow-xs" />`;
+      document.getElementById('qris-preview-payload').innerText = data.dynamicPayload;
+      document.getElementById('qris-preview-modal').style.display = 'block';
+      document.getElementById('qris-preview-modal').scrollIntoView({ behavior: 'smooth' });
+    } catch (e) {
+      alert('Error: ' + e.message);
+    }
+  }
+</script>
+
+  <!-- Modal Test Telegram Connection -->
+  <dialog id="modal-test-telegram" class="modal">
+    <div class="modal-box bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 max-w-md">
+      <h3 class="font-bold text-base text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+        <span>✈️ Uji Kirim Pesan Telegram</span>
+      </h3>
+      <p class="text-xs text-slate-500 mb-4">Pastikan Anda sudah memulai chat ke bot (klik <b>/start</b>) atau bot sudah dimasukkan ke grup CS sebelum menguji pengiriman pesan.</p>
+      
+      <form action="/admin/settings/telegram/test" method="POST" class="space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Telegram Bot Token</label>
+          <input type="password" name="telegram_bot_token" id="modal_tele_token" value="<%= settings.telegram_bot_token || '' %>" required placeholder="123456789:ABCdef..." class="input-fintech w-full font-mono text-xs" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Telegram Chat ID / Group ID</label>
+          <input type="text" name="telegram_chat_id" id="modal_tele_chat_id" value="<%= settings.telegram_chat_id || '' %>" required placeholder="Contoh: 123456789 atau -1001234567890" class="input-fintech w-full font-mono text-xs" />
+        </div>
+
+        <div class="modal-action flex justify-end gap-2 pt-2">
+          <button type="button" onclick="document.getElementById('modal-test-telegram').close()" class="btn btn-sm btn-ghost text-xs">Batal</button>
+          <button type="submit" class="btn btn-sm bg-sky-600 hover:bg-sky-700 text-white border-0 text-xs font-semibold gap-1.5">
+            <span>Kirim Pesan Tes</span>
+          </button>
+        </div>
+      </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button>close</button>
+    </form>
+  </dialog>
+
+<%- include('../partials/footer') %>
+

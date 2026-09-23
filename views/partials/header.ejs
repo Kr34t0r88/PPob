@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title + ' — ' : '' %><%= appName %> Hub</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/public/images/favicon.png">
+
+  <!-- Tailwind CSS & DaisyUI via CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#F0F7FF',
+              100: '#E0EFFF',
+              500: '#2563EB',
+              600: '#1D4ED8',
+              700: '#1E40AF',
+              900: '#0B1E48',
+            },
+            dark: {
+              950: '#06090F',
+              900: '#090D16',
+              850: '#0F172A',
+              800: '#1E293B',
+              700: '#334155',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Pro Fintech Styles -->
+  <link rel="stylesheet" href="/public/css/app.css">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body class="h-screen overflow-hidden flex flex-col font-sans antialiased text-slate-800" data-page="<%= typeof activeNav !== 'undefined' ? activeNav : '' %>">
+
+  <!-- Mobile Overlay -->
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+  <div class="flex flex-1 overflow-hidden h-screen w-full">
+    
+    <!-- Bespoke Sidebar (Locked height, sticky, independent scrolling) -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 h-screen max-h-screen pro-sidebar flex flex-col transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0 lg:static lg:h-screen lg:shrink-0 overflow-hidden shadow-2xl lg:shadow-none">
+      
+      <!-- Brand Header (Fixed top of sidebar) -->
+      <div class="h-16 shrink-0 flex items-center justify-between px-5 border-b border-white/5 bg-slate-950/60 z-10">
+        <a href="/admin/dashboard" class="flex items-center gap-3 group">
+          <img src="/public/images/logo-icon.png" alt="Juragan Pulsa Logo" class="w-8 h-8 rounded-lg shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform object-cover" />
+          <div>
+            <h1 class="font-bold text-sm tracking-tight text-white flex items-center gap-1.5">
+
+              <%= appName %>
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-400 font-mono font-semibold">H2H</span>
+            </h1>
+            <p class="text-[10px] text-slate-400 font-mono font-medium">Gateway Hub v1.0</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Navigation Scrollable (Independent Scroll Container) -->
+      <nav class="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto overscroll-contain custom-sidebar-nav">
+        
+        <div class="sidebar-heading">Ringkasan &amp; Transaksi</div>
+        
+        <a href="/admin/dashboard" class="sidebar-nav-item <%= typeof activeNav !== 'undefined' && activeNav === 'dashboard' ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 12a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1v-7z"></path></svg>
+          <span>Dashboard Overview</span>
+        </a>
+
+        <a href="/admin/public-orders" class="sidebar-nav-item <%= typeof activeNav !== 'undefined' && activeNav === 'public_orders' ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+          <span class="flex items-center justify-between w-full">
+            <span>Web Store Publik</span>
+            <span class="badge badge-xs bg-blue-500/20 text-blue-400 font-mono text-[9px] border-0">Direct</span>
+          </span>
+        </a>
+
+        <a href="/admin/transactions" class="sidebar-nav-item <%= typeof activeNav !== 'undefined' && activeNav === 'transactions' ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          <span>Transaksi Live</span>
+        </a>
+
+        <div class="sidebar-heading">Produk &amp; Hub Provider</div>
+
+        <a href="/admin/products" class="sidebar-nav-item <%= typeof activeNav !== 'undefined' && activeNav === 'products' ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+          <span>Katalog &amp; Margin</span>
+        </a>
+
+        <a href="/admin/providers" class="sidebar-nav-item <%= typeof activeNav !== 'undefined' && activeNav === 'providers' ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+          <span>Provider Digiflazz</span>
+        </a>
+
+        <div class="sidebar-heading">Jaringan Agen &amp; Deposit</div>
+
+        <a href="/admin/agents" class="sidebar-nav-item <%= typeof activeNav !== 'undefined' && activeNav === 'agents' ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          <span>Daftar Reseller</span>
+        </a>
+
+        <a href="/admin/deposits" class="sidebar-nav-item <%= typeof activeNav !== 'undefined' && activeNav === 'deposits' ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+          <span>Tiket Deposit &amp; Bank</span>
+        </a>
+
+        <div class="sidebar-heading">Keuangan &amp; Konfigurasi</div>
+
+        <a href="/admin/reports" class="sidebar-nav-item <%= typeof activeNav !== 'undefined' && activeNav === 'reports' ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          <span>Laporan Keuangan</span>
+        </a>
+
+        <a href="/admin/settings" class="sidebar-nav-item <%= typeof activeNav !== 'undefined' && activeNav === 'settings' ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          <span>Pengaturan Sistem</span>
+        </a>
+
+      </nav>
+
+      <!-- Bottom User Profile Card (Fixed at bottom of sidebar) -->
+      <div class="p-3 shrink-0 border-t border-white/5 bg-slate-950/60 z-10">
+        <div class="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between">
+          <div class="flex items-center gap-2.5 overflow-hidden">
+            <div class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700/80 flex items-center justify-center font-bold text-xs text-blue-400 font-mono">
+              <%= typeof adminUser !== 'undefined' && adminUser && adminUser.name ? adminUser.name.charAt(0).toUpperCase() : 'A' %>
+            </div>
+            <div class="overflow-hidden">
+              <p class="text-xs font-semibold text-white truncate"><%= typeof adminUser !== 'undefined' && adminUser ? adminUser.name : 'Administrator' %></p>
+              <span class="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Superadmin
+              </span>
+            </div>
+          </div>
+          <a href="/admin/logout" class="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-rose-500/10 transition-colors" title="Keluar">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Shell (Independent Scroll Area) -->
+    <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto bg-slate-50 dark:bg-[#090D16]">
+      
+      <!-- Top Navigation Bar -->
+      <header class="h-16 shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-30 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+        
+        <div class="flex items-center gap-3">
+          <button id="mobile-menu-btn" class="btn btn-ghost btn-square btn-sm lg:hidden text-slate-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+          </button>
+          
+          <div class="flex items-center gap-2 text-xs font-medium text-slate-400">
+            <span class="text-slate-600 font-semibold">Juragan Pulsa</span>
+            <span>/</span>
+            <span class="text-slate-900 font-bold"><%= typeof title !== 'undefined' ? title : 'Dashboard' %></span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2.5 sm:gap-3">
+          <!-- Saldo Digiflazz Live Badge -->
+          <a href="/admin/providers" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-800/80 hover:bg-blue-100/70 dark:hover:bg-blue-900/40 transition-colors shadow-sm" title="Klik untuk kelola provider & cek saldo live">
+            <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            <div class="flex flex-col text-left">
+              <span class="text-[9px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Saldo Digiflazz</span>
+              <span class="text-xs font-mono font-bold text-slate-900 dark:text-white">
+                <%= typeof formatRupiah !== 'undefined' ? formatRupiah(locals.digiBalance || 0) : 'Rp ' + (locals.digiBalance || 0) %>
+              </span>
+            </div>
+          </a>
+
+          <!-- Fast Action: Sync Produk -->
+          <form action="/admin/products/sync" method="POST" class="hidden md:inline">
+            <button type="submit" class="btn btn-sm btn-ghost gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">
+              <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+              <span>Sync Pricelist</span>
+            </button>
+          </form>
+
+          <!-- Theme Toggle (Clean Icon) -->
+          <label class="swap swap-rotate btn btn-ghost btn-circle btn-sm text-slate-500">
+            <input type="checkbox" id="theme-toggle" />
+            <svg class="swap-off w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            <svg class="swap-on w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+          </label>
+        </div>
+      </header>
+
+      <!-- Flash Notification Container -->
+      <% if (typeof flashMessage !== 'undefined' && flashMessage) { %>
+        <div id="flash-message" class="mx-4 lg:mx-8 mt-4">
+          <div class="flex items-center gap-3 p-3.5 rounded-xl text-xs font-semibold shadow-sm <%= flashMessage.type === 'error' ? 'bg-rose-50 border border-rose-200 text-rose-800' : (flashMessage.type === 'warning' ? 'bg-amber-50 border border-amber-200 text-amber-800' : 'bg-emerald-50 border border-emerald-200 text-emerald-800') %>">
+            <span><%= flashMessage.type === 'error' ? '❌' : (flashMessage.type === 'warning' ? '⚠️' : '✅') %></span>
+            <span><%= flashMessage.message %></span>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- Main Body Container -->
+      <main class="flex-1 p-4 lg:p-8 space-y-6">

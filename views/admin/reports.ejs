@@ -1,0 +1,164 @@
+<%- include('../partials/header') %>
+
+<div class="space-y-5">
+
+  <!-- Header Action Bar -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div>
+      <h3 class="text-lg lg:text-xl font-bold text-slate-900 dark:text-white tracking-tight">Laporan Keuangan & Performa</h3>
+      <p class="text-xs text-slate-500">Analisis pendapatan, perputaran omset pulsa, dan distribusi kategori transaksi.</p>
+    </div>
+    <a href="/admin/reports/export/csv?<%= new URLSearchParams(filter).toString() %>" class="btn btn-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 text-xs font-semibold gap-1.5 shadow-sm">
+      <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+      <span>Download CSV</span>
+    </a>
+  </div>
+
+  <!-- Filter Bar (Responsive Grid) -->
+  <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+    <form action="/admin/reports" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
+      <div>
+        <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Dari Tanggal</label>
+        <input type="date" name="date_from" value="<%= filter.date_from || '' %>" class="input-fintech w-full" />
+      </div>
+      <div>
+        <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Sampai Tanggal</label>
+        <input type="date" name="date_to" value="<%= filter.date_to || '' %>" class="input-fintech w-full" />
+      </div>
+      <div>
+        <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Filter Agen</label>
+        <select name="agent_id" class="input-fintech w-full">
+          <option value="">Semua Agen</option>
+          <% agentsList.forEach(a => { %>
+            <option value="<%= a.id %>" <%= filter.agent_id == a.id ? 'selected' : '' %>><%= a.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div>
+        <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Kategori</label>
+        <select name="category" class="input-fintech w-full">
+          <option value="">Semua Kategori</option>
+          <% categoriesList.forEach(c => { %>
+            <option value="<%= c.category %>" <%= filter.category == c.category ? 'selected' : '' %>><%= c.category %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="flex items-end gap-2">
+        <button type="submit" class="btn btn-sm bg-slate-900 hover:bg-slate-800 text-white border-0 flex-1 text-xs">Terapkan</button>
+        <a href="/admin/reports" class="btn btn-sm btn-ghost text-xs">Reset</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Summary Cards Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    
+    <div class="metric-card">
+      <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Omset Penjualan</span>
+      <div class="text-2xl lg:text-3xl font-black text-slate-900 dark:text-white mt-2 font-mono"><%= formatRupiah(summary.total_omset || 0) %></div>
+      <div class="mt-2 flex items-center gap-1.5 text-xs text-slate-500">
+        <span class="font-bold text-slate-700 dark:text-slate-300"><%= summary.success_trx || 0 %></span> Transaksi Sukses
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Modal Produk H2H</span>
+      <div class="text-2xl lg:text-3xl font-black text-slate-900 dark:text-white mt-2 font-mono"><%= formatRupiah(summary.total_modal || 0) %></div>
+      <div class="mt-2 text-xs text-slate-500">
+        Biaya terpotong ke Digiflazz
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Laba / Margin Bersih</span>
+      <div class="text-2xl lg:text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-2 font-mono"><%= formatRupiah(summary.total_profit || 0) %></div>
+      <div class="mt-2 flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
+        <span>Profit Bersih Server</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Category Breakdown & Top Agents Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    
+    <!-- Category Breakdown -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500">Omset Berdasarkan Kategori</h4>
+        <span class="text-[11px] text-slate-400">Distribusi Produk</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="fintech-table">
+          <thead>
+            <tr>
+              <th>Kategori</th>
+              <th class="text-right">Trx Sukses</th>
+              <th class="text-right">Total Omset</th>
+              <th class="text-right">Profit Server</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (categoryReport && categoryReport.length > 0) { %>
+              <% categoryReport.forEach(c => { %>
+                <tr>
+                  <td class="font-bold text-xs text-slate-900 dark:text-white"><%= c.category %></td>
+                  <td class="text-xs text-right font-mono text-slate-600 dark:text-slate-300"><%= c.total_trx %></td>
+                  <td class="text-xs text-right font-bold font-mono text-slate-900 dark:text-white"><%= formatRupiah(c.omset) %></td>
+                  <td class="text-xs text-right font-bold font-mono text-emerald-600 dark:text-emerald-400"><%= formatRupiah(c.profit) %></td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr><td colspan="4" class="text-center py-6 text-xs text-slate-400">Tidak ada data transaksi.</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Agent Leaderboard -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500">Peringkat Penjualan Agen</h4>
+        <span class="text-[11px] text-slate-400">Top Kontributor</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="fintech-table">
+          <thead>
+            <tr>
+              <th>Nama Agen</th>
+              <th class="text-right">Trx Sukses</th>
+              <th class="text-right">Total Omset</th>
+              <th class="text-right">Profit Server</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (agentReport && agentReport.length > 0) { %>
+              <% agentReport.forEach(a => { %>
+                <tr>
+                  <td>
+                    <a href="/admin/agents/<%= a.id %>" class="font-bold text-xs text-slate-900 dark:text-white hover:text-blue-600">
+                      <%= a.name %>
+                    </a>
+                    <p class="text-[10px] text-slate-400 font-mono">@<%= a.username %></p>
+                  </td>
+                  <td class="text-xs text-right font-mono text-slate-600 dark:text-slate-300"><%= a.success_trx %></td>
+                  <td class="text-xs text-right font-bold font-mono text-slate-900 dark:text-white"><%= formatRupiah(a.total_omset) %></td>
+                  <td class="text-xs text-right font-bold font-mono text-emerald-600 dark:text-emerald-400"><%= formatRupiah(a.total_profit) %></td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr><td colspan="4" class="text-center py-6 text-xs text-slate-400">Tidak ada data performa agen.</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<%- include('../partials/footer') %>

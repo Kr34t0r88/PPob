@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Error' %> — <%= typeof appName !== 'undefined' ? appName : 'Juragan Pulsa' %></title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-base-200 min-h-screen flex items-center justify-center p-4 font-sans text-center">
+
+  <div class="max-w-md bg-base-100 p-8 rounded-2xl border border-base-300 shadow-xl space-y-4">
+    <div class="text-6xl font-black text-blue-600"><%= typeof code !== 'undefined' ? code : '500' %></div>
+    <h2 class="text-xl font-bold text-base-content"><%= typeof title !== 'undefined' ? title : 'Terjadi Kesalahan' %></h2>
+    <p class="text-sm text-base-content/70"><%= typeof message !== 'undefined' ? message : 'Halaman atau endpoint yang Anda tuju tidak dapat diproses.' %></p>
+    
+    <div class="pt-4">
+      <a href="/admin" class="btn btn-primary btn-sm bg-blue-600 text-white border-0">
+        Kembali ke Dashboard
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>

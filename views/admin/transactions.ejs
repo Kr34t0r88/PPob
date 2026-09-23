@@ -1,0 +1,160 @@
+<%- include('../partials/header') %>
+
+<div class="space-y-5">
+
+  <!-- Header Action Bar -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div>
+      <h3 class="text-lg lg:text-xl font-bold text-slate-900 dark:text-white tracking-tight">Log Transaksi H2H</h3>
+      <p class="text-xs text-slate-500">Seluruh riwayat transaksi agen beserta status serial number operator.</p>
+    </div>
+    <div>
+      <a href="/admin/reports/export/csv?<%= new URLSearchParams(filter).toString() %>" class="btn btn-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 text-xs font-semibold gap-1.5 shadow-sm">
+        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+        <span>Export CSV</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Filter Card (Mobile Responsive Grid) -->
+  <!-- Filter Card (Mobile Responsive Grid) -->
+  <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+    <form action="/admin/transactions" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2.5">
+      <div>
+        <input type="text" name="q" value="<%= filter.q || '' %>" placeholder="Cari Ref ID, Target, Produk..." class="input-fintech w-full" />
+      </div>
+
+      <div>
+        <select name="channel" class="input-fintech w-full">
+          <option value="">Semua Channel</option>
+          <option value="web_public" <%= filter.channel === 'web_public' ? 'selected' : '' %>>🌐 Web Publik</option>
+          <option value="app" <%= filter.channel === 'app' ? 'selected' : '' %>>📱 APK Agen</option>
+          <option value="wa" <%= filter.channel === 'wa' ? 'selected' : '' %>>💬 WhatsApp Bot</option>
+        </select>
+      </div>
+
+      <div>
+        <select name="status" class="input-fintech w-full">
+          <option value="">Semua Status</option>
+          <option value="success" <%= filter.status === 'success' ? 'selected' : '' %>>Sukses</option>
+          <option value="pending" <%= filter.status === 'pending' ? 'selected' : '' %>>Pending</option>
+          <option value="failed" <%= filter.status === 'failed' ? 'selected' : '' %>>Gagal</option>
+        </select>
+      </div>
+
+      <div>
+        <input type="date" name="date_from" value="<%= filter.date_from || '' %>" class="input-fintech w-full" />
+      </div>
+
+      <div>
+        <input type="date" name="date_to" value="<%= filter.date_to || '' %>" class="input-fintech w-full" />
+      </div>
+
+      <div class="flex gap-2">
+        <button type="submit" class="btn btn-sm bg-slate-900 hover:bg-slate-800 text-white border-0 flex-1 text-xs">Filter</button>
+        <a href="/admin/transactions" class="btn btn-sm btn-ghost text-xs">Reset</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Table Card (Horizontal Touch-Scroll for Mobile) -->
+  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="fintech-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Ref ID / Waktu</th>
+            <th>Agen / Sumber</th>
+            <th>Produk</th>
+            <th>Tujuan</th>
+            <th>Harga Jual</th>
+            <th>Margin</th>
+            <th>Status</th>
+            <th class="text-right">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (transactions && transactions.length > 0) { %>
+            <% transactions.forEach(t => { %>
+              <tr>
+                <td class="font-mono text-xs text-slate-400">#<%= t.id %></td>
+                <td>
+                  <button type="button" onclick="copyToClipboard('<%= t.ref_id %>', 'Ref ID')" class="btn-copy" title="Salin Ref ID">
+                    <span><%= t.ref_id %></span>
+                    <svg class="w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+                  </button>
+                  <p class="text-[10px] text-slate-400 font-mono mt-0.5"><%= formatDateTime(t.created_at) %></p>
+                </td>
+                <td>
+                  <% if (t.channel === 'web_public') { %>
+                    <div class="font-bold text-xs text-cyan-600 dark:text-cyan-400 flex items-center gap-1">🌐 Web Storefront</div>
+                    <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-semibold bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-mono">Pembeli Publik</span>
+                  <% } else if (t.agent_name) { %>
+                    <div class="font-bold text-xs text-slate-900 dark:text-white"><%= t.agent_name %></div>
+                    <div class="text-[10px] text-slate-400 font-mono"><%= t.agent_phone || '-' %></div>
+                  <% } else { %>
+                    <div class="font-bold text-xs text-slate-900 dark:text-white">Admin</div>
+                    <span class="text-[10px] text-slate-400 font-mono">Manual</span>
+                  <% } %>
+                </td>
+                <td>
+                  <div class="text-xs font-semibold text-slate-800 dark:text-slate-200 max-w-[150px] truncate" title="<%= t.product_name %>"><%= t.product_name %></div>
+                  <span class="text-[10px] font-mono text-slate-400"><%= t.category || 'Pulsa' %></span>
+                </td>
+                <td>
+                  <button type="button" onclick="copyToClipboard('<%= t.target %>', 'Nomor HP')" class="btn-copy" title="Salin Nomor">
+                    <span><%= t.target %></span>
+                    <svg class="w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+                  </button>
+                </td>
+                <td class="font-mono text-xs font-bold text-slate-900 dark:text-white"><%= formatRupiah(t.price_sell) %></td>
+                <td class="font-mono text-xs font-semibold text-emerald-600">+<%= formatRupiah(t.profit) %></td>
+                <td>
+                  <% if (t.status === 'success') { %>
+                    <span class="badge-status badge-status-success">
+                      <span class="dot-pulse dot-pulse-success"></span> Sukses
+                    </span>
+                  <% } else if (t.status === 'pending' || t.status === 'processing') { %>
+                    <span class="badge-status badge-status-pending">
+                      <span class="dot-pulse dot-pulse-pending"></span> <%= t.status === 'processing' ? 'Proses' : 'Pending' %>
+                    </span>
+                  <% } else { %>
+                    <span class="badge-status badge-status-failed">
+                      <span class="dot-pulse dot-pulse-failed"></span> Gagal
+                    </span>
+                  <% } %>
+                </td>
+                <td class="text-right">
+                  <a href="/admin/transactions/<%= t.id %>" class="btn btn-xs btn-ghost text-blue-600 hover:bg-blue-50 font-bold">Detail</a>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="9" class="text-center py-10 text-xs text-slate-400">Tidak ada transaksi ditemukan sesuai filter.</td>
+            </tr>
+          <% } %>
+        </tbody>
+
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <% if (pagination && pagination.totalPages > 1) { %>
+      <div class="p-3.5 border-t border-slate-100 dark:border-slate-800 flex justify-center">
+        <div class="join">
+          <% for(let i = 1; i <= pagination.totalPages; i++) { %>
+            <a href="/admin/transactions?page=<%= i %>&q=<%= filter.q || '' %>&status=<%= filter.status || '' %>&date_from=<%= filter.date_from || '' %>&date_to=<%= filter.date_to || '' %>"
+               class="join-item btn btn-xs <%= pagination.page === i ? 'btn-active bg-blue-600 text-white border-0' : 'btn-ghost' %>">
+              <%= i %>
+            </a>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+</div>
+
+<%- include('../partials/footer') %>

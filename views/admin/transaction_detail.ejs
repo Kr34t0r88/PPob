@@ -1,0 +1,119 @@
+<%- include('../partials/header') %>
+
+<div class="max-w-3xl mx-auto space-y-5">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <a href="/admin/transactions" class="btn btn-sm btn-ghost text-slate-600 gap-1">&larr; Kembali</a>
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white">Rincian Transaksi #<%= tx.id %></h3>
+    </div>
+    
+    <% if (tx.status === 'pending') { %>
+      <form action="/admin/transactions/<%= tx.id %>/recheck" method="POST">
+        <button type="submit" class="btn btn-sm bg-amber-500 hover:bg-amber-600 text-white border-0 font-bold text-xs gap-1.5 shadow-sm">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          <span>Cek Ulang Status ke Vendor</span>
+        </button>
+      </form>
+    <% } %>
+  </div>
+
+  <!-- Detail Card -->
+  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 sm:p-7 shadow-sm space-y-6">
+    
+    <!-- Status Banner -->
+    <div class="p-4 rounded-xl flex items-center justify-between <%= tx.status === 'success' ? 'bg-emerald-50 border border-emerald-200 text-emerald-900' : (tx.status === 'pending' ? 'bg-amber-50 border border-amber-200 text-amber-900' : 'bg-rose-50 border border-rose-200 text-rose-900') %>">
+      <div class="space-y-0.5">
+        <span class="text-[10px] uppercase font-bold tracking-wider opacity-70">Status Transaksi</span>
+        <h4 class="text-base font-extrabold uppercase tracking-tight flex items-center gap-2">
+          <% if (tx.status === 'success') { %>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> Transaksi Berhasil
+          <% } else if (tx.status === 'pending') { %>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span> Sedang Diproses
+          <% } else { %>
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-600"></span> Transaksi Gagal (Auto-Refund)
+          <% } %>
+        </h4>
+        <p class="text-xs font-medium"><%= tx.message || 'Tidak ada pesan dari vendor' %></p>
+      </div>
+    </div>
+
+    <!-- Serial Number (SN) / Token Box (Prominent) -->
+    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono">Serial Number (SN) / Token Listrik</span>
+        <% if (tx.sn) { %>
+          <button type="button" onclick="copyToClipboard('<%= tx.sn %>', 'SN / Token')" class="btn-copy">
+            <span>Salin SN</span>
+            <svg class="w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+          </button>
+        <% } %>
+      </div>
+      <div class="font-mono text-sm font-extrabold text-blue-600 dark:text-blue-400 select-all tracking-wide break-all">
+        <%= tx.sn || 'Belum ada serial number (masih dalam antrean atau gagal)' %>
+      </div>
+    </div>
+
+    <!-- Info Grid (2 Columns) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+      
+      <div class="p-3.5 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-100 dark:border-slate-800">
+        <p class="text-slate-400 font-medium font-mono">Ref ID Internal</p>
+        <p class="font-mono font-bold text-slate-800 dark:text-slate-200 text-sm mt-1 select-all"><%= tx.ref_id %></p>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-100 dark:border-slate-800">
+        <p class="text-slate-400 font-medium font-mono">Provider Trx ID</p>
+        <p class="font-mono font-bold text-slate-800 dark:text-slate-200 text-sm mt-1 select-all"><%= tx.provider_ref_id || '-' %></p>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-100 dark:border-slate-800">
+        <p class="text-slate-400 font-medium">Nama Produk &amp; SKU</p>
+        <p class="font-bold text-slate-900 dark:text-white text-sm mt-1"><%= tx.product_name %></p>
+        <p class="font-mono text-slate-400 text-[11px] mt-0.5">SKU: <%= tx.product_sku %></p>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-100 dark:border-slate-800">
+        <p class="text-slate-400 font-medium">Nomor Tujuan / ID Pelanggan</p>
+        <p class="font-mono font-extrabold text-blue-600 text-sm mt-1 select-all"><%= tx.target %></p>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-100 dark:border-slate-800">
+        <p class="text-slate-400 font-medium">Harga Modal Provider</p>
+        <p class="font-mono font-bold text-slate-700 dark:text-slate-300 text-sm mt-1"><%= formatRupiah(tx.price_modal) %></p>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-100 dark:border-slate-800">
+        <p class="text-slate-400 font-medium">Harga Jual Agen (Debet Saldo)</p>
+        <p class="font-mono font-bold text-emerald-600 text-sm mt-1"><%= formatRupiah(tx.price_sell) %></p>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-100 dark:border-slate-800">
+        <p class="text-slate-400 font-medium">Agen Pemesan</p>
+        <p class="font-bold text-slate-900 dark:text-white text-sm mt-1"><%= tx.agent_name || 'Admin' %></p>
+        <p class="text-[11px] font-mono text-slate-400">@<%= tx.agent_username || 'admin' %></p>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-100 dark:border-slate-800">
+        <p class="text-slate-400 font-medium">Waktu Transaksi</p>
+        <p class="font-mono text-slate-700 dark:text-slate-300 text-xs mt-1"><%= formatDateTime(tx.created_at) %></p>
+      </div>
+
+    </div>
+
+    <!-- Collapsible Raw Provider Log (Debugging) -->
+    <details class="group rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+      <summary class="p-3 bg-slate-50 dark:bg-slate-950/60 font-mono text-xs font-bold text-slate-600 dark:text-slate-300 cursor-pointer select-none">
+        Payload Response Mentah Provider (JSON)
+      </summary>
+      <div class="p-4 bg-slate-950 overflow-x-auto text-[11px] font-mono text-emerald-400">
+        <pre><%= tx.provider_response || '{}' %></pre>
+      </div>
+    </details>
+
+  </div>
+
+</div>
+
+<%- include('../partials/footer') %>

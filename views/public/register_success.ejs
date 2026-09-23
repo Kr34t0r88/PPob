@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="<%= logo || '/public/images/favicon.png' %>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- DaisyUI & Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #080C14;
+      color: #E2E8F0;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glow-success {
+      box-shadow: 0 0 45px -5px rgba(16, 185, 129, 0.25);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-emerald-600 selection:text-white">
+
+  <!-- ── Top Navbar ─────────────────────────────────────────────────────────── -->
+  <header class="sticky top-0 z-50 bg-[#080C14]/90 backdrop-blur-md border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <a href="/" class="flex items-center gap-3 group">
+        <% if (logo) { %>
+          <img src="<%= logo %>" alt="<%= storeName %>" class="w-10 h-10 rounded-xl object-cover shadow-lg border border-slate-700/50" />
+        <% } else { %>
+          <img src="/public/images/logo-brand.jpg" alt="<%= storeName %>" class="w-10 h-10 rounded-xl object-cover shadow-lg border border-slate-700/50 group-hover:scale-105 transition-transform" />
+        <% } %>
+        <div>
+          <div class="text-base font-extrabold text-white tracking-tight flex items-center gap-1.5">
+            <span><%= storeName %></span>
+            <span class="badge badge-xs bg-emerald-500 text-white font-bold px-1.5 py-0.5">SUKSES</span>
+          </div>
+          <p class="text-[10px] text-slate-400 font-medium hidden sm:block">Aktivasi Akun Mitra Berhasil</p>
+        </div>
+      </a>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-2.5">
+        <a href="/" class="btn btn-sm btn-ghost text-slate-300 hover:text-white border border-slate-800 text-xs font-semibold gap-1.5">
+          <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+          <span>Etalase Top-Up</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ── Main Content ────────────────────────────────────────────────────────── -->
+  <main class="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    
+    <!-- Header Sukses -->
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-emerald-500/20 text-3xl animate-bounce">
+        🎉
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+        Selamat, Pendaftaran Akun Agen Berhasil!
+      </h1>
+      <p class="text-slate-400 text-sm mt-1.5">
+        Akun kemitraan Anda telah aktif dan siap digunakan untuk transaksi pulsa, kuota, & PPOB.
+      </p>
+      
+      <% if (waSent) { %>
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold mt-3">
+          <span>✅ Rincian login & QR Code telah dikirimkan ke WhatsApp Anda</span>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Digital Card & QR Code -->
+    <div class="glass-card rounded-2xl p-6 sm:p-8 border border-emerald-500/30 glow-success shadow-2xl relative overflow-hidden mb-8">
+      <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        
+        <!-- QR Code Column (5 Kolom) -->
+        <div class="md:col-span-5 flex flex-col items-center text-center p-4 bg-slate-900/90 rounded-2xl border border-slate-800">
+          <div class="text-xs font-extrabold text-sky-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <span>📷 QR Code Login APK</span>
+          </div>
+
+          <!-- Gambar QR Code -->
+          <div class="p-3 bg-white rounded-xl shadow-lg inline-block">
+            <img id="qr-image" src="<%= qrDataUrl %>" alt="QR Code Login Agen" class="w-48 h-48 sm:w-52 sm:h-52 object-contain" />
+          </div>
+
+          <p class="text-[11px] text-slate-400 mt-2.5 max-w-[220px]">
+            Scan gambar ini dari aplikasi Android <strong class="text-slate-200"><%= storeName %></strong> untuk Instant Login.
+          </p>
+
+          <div class="mt-3 flex items-center gap-2">
+            <a href="<%= qrDataUrl %>" download="QR-Login-<%= agent.username %>.png" class="btn btn-xs bg-sky-600 hover:bg-sky-500 text-white border-0 font-bold gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              <span>Simpan Gambar QR</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Detail Akun Column (7 Kolom) -->
+        <div class="md:col-span-7 space-y-3.5">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div>
+              <span class="text-xs text-slate-400 font-medium">Nama Mitra</span>
+              <h3 class="text-lg font-black text-white"><%= agent.name %></h3>
+            </div>
+            <span class="badge badge-success bg-emerald-500/10 border-emerald-500/30 text-emerald-400 text-xs font-bold py-2.5 px-3">
+              🟢 Status: Aktif
+            </span>
+          </div>
+
+          <!-- Rincian Parameter -->
+          <div class="space-y-2.5 text-xs">
+            
+            <!-- Server URL -->
+            <div class="p-2.5 rounded-xl bg-slate-900/70 border border-slate-800 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-slate-400 block font-semibold uppercase tracking-wider">Server URL</span>
+                <span class="font-mono text-slate-200 font-bold"><%= serverUrl %></span>
+              </div>
+              <button onclick="copyText('<%= serverUrl %>', 'Server URL')" class="btn btn-ghost btn-xs text-sky-400 hover:text-white" title="Salin">
+                📋
+              </button>
+            </div>
+
+            <!-- Username -->
+            <div class="p-2.5 rounded-xl bg-slate-900/70 border border-slate-800 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-slate-400 block font-semibold uppercase tracking-wider">Username Agen</span>
+                <span class="font-mono text-sky-400 font-bold text-sm"><%= agent.username %></span>
+              </div>
+              <button onclick="copyText('<%= agent.username %>', 'Username')" class="btn btn-ghost btn-xs text-sky-400 hover:text-white" title="Salin">
+                📋
+              </button>
+            </div>
+
+            <!-- Password -->
+            <div class="p-2.5 rounded-xl bg-slate-900/70 border border-slate-800 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-slate-400 block font-semibold uppercase tracking-wider">Password / PIN</span>
+                <span class="font-mono text-amber-400 font-bold text-sm"><%= agent.password %></span>
+              </div>
+              <button onclick="copyText('<%= agent.password %>', 'Password')" class="btn btn-ghost btn-xs text-sky-400 hover:text-white" title="Salin">
+                📋
+              </button>
+            </div>
+
+            <!-- WhatsApp & Saldo -->
+            <div class="grid grid-cols-2 gap-2.5">
+              <div class="p-2.5 rounded-xl bg-slate-900/70 border border-slate-800">
+                <span class="text-[10px] text-slate-400 block font-semibold uppercase tracking-wider">No. WhatsApp</span>
+                <span class="font-mono text-slate-200 font-bold"><%= agent.phone %></span>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-900/70 border border-slate-800">
+                <span class="text-[10px] text-slate-400 block font-semibold uppercase tracking-wider">Saldo Awal</span>
+                <span class="font-mono text-emerald-400 font-bold"><%= formatRupiah(0) %></span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Tombol Copy All Credentials -->
+          <div class="pt-2">
+            <button onclick="copyAllDetails()" id="btn-copy-all" class="btn btn-sm w-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold gap-2">
+              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+              <span>Salin Rincian Akun Lengkap</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Panduan Cepat 3 Langkah -->
+    <div class="glass-card rounded-2xl p-6 border border-slate-800 mb-8">
+      <h3 class="text-sm font-extrabold text-white mb-4 flex items-center gap-2">
+        <span>📲 Panduan Memulai Transaksi:</span>
+      </h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
+          <div class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 font-bold flex items-center justify-center mb-2 text-sm">1</div>
+          <h4 class="font-bold text-white mb-1">Unduh Aplikasi APK</h4>
+          <p class="text-slate-400">Unduh & install aplikasi resmi agen Android melalui tombol di bawah.</p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
+          <div class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 font-bold flex items-center justify-center mb-2 text-sm">2</div>
+          <h4 class="font-bold text-white mb-1">Scan QR Code Login</h4>
+          <p class="text-slate-400">Buka aplikasi, klik <strong>Scan QR Akun</strong>, lalu arahkan kamera ke gambar QR di atas.</p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
+          <div class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 font-bold flex items-center justify-center mb-2 text-sm">3</div>
+          <h4 class="font-bold text-white mb-1">Isi Saldo & Transaksi</h4>
+          <p class="text-slate-400">Lakukan deposit via QRIS otomatis dan mulai jualan dengan margin profit tinggi!</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons Grid -->
+      <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <a href="<%= appDownloadUrl %>" class="btn btn-primary bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white border-0 font-extrabold text-xs shadow-lg shadow-sky-600/30 gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          <span>Unduh APK Agen Android</span>
+        </a>
+
+        <% if (csWhatsapp) { 
+             const waClean = (csWhatsapp || '').replace(/\D/g, '').replace(/^0/, '62');
+        %>
+          <a href="https://wa.me/<%= waClean %>?text=<%= encodeURIComponent('Halo Admin ' + storeName + ', saya baru saja mendaftar sebagai agen dengan username: ' + agent.username) %>" target="_blank" class="btn btn-ghost bg-emerald-950/40 text-emerald-400 hover:bg-emerald-900/50 border border-emerald-800 text-xs font-bold gap-2">
+            💬 Buka WhatsApp CS
+          </a>
+        <% } %>
+
+        <a href="/" class="btn btn-ghost text-slate-400 hover:text-white border border-slate-800 text-xs font-semibold">
+          🏠 Kembali ke Beranda
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── Footer ──────────────────────────────────────────────────────────────── -->
+  <footer class="mt-auto border-t border-slate-800/80 bg-[#06090F] py-6 text-center text-xs text-slate-500">
+    <p>© <%= new Date().getFullYear() %> <strong><%= storeName %></strong> • Powered by <span class="text-sky-400 font-semibold">ALIJAYA NET</span></p>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="px-4 py-2.5 rounded-xl bg-sky-600 text-white text-xs font-bold shadow-2xl flex items-center gap-2">
+      <span id="toast-msg">Tersalin ke clipboard!</span>
+    </div>
+  </div>
+
+  <script>
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      if (toast && toastMsg) {
+        toastMsg.innerText = msg;
+        toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+        setTimeout(() => {
+          toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+        }, 2500);
+      }
+    }
+
+    function copyText(text, label) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(`✅ ${label} berhasil disalin!`);
+        });
+      }
+    }
+
+    function copyAllDetails() {
+      const fullText = 
+`*🎉 DETAIL AKUN AGEN <%= storeName.toUpperCase() %>*
+• Server URL: <%= serverUrl %>
+• Nama: <%= agent.name %>
+• Username: <%= agent.username %>
+• Password: <%= agent.password %>
+• No. WhatsApp: <%= agent.phone %>
+• Saldo Awal: Rp 0
+
+📲 Download APK: <%= serverUrl %><%= appDownloadUrl %>
+Buka aplikasi dan scan QR Code Akun untuk login instan!`;
+
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(fullText).then(() => {
+          showToast('✅ Semua rincian akun berhasil disalin!');
+        });
+      }
+    }
+  </script>
+</body>
+</html>

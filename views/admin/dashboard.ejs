@@ -1,0 +1,294 @@
+<%- include('../partials/header') %>
+
+<!-- Top Hero Summary Card (Clean Fintech Style) -->
+<div class="p-5 lg:p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-850 to-blue-950 text-white border border-slate-800 shadow-xl relative overflow-hidden">
+  <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+  
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 relative z-10">
+    <div class="space-y-1">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-xs font-mono font-semibold uppercase tracking-wider text-blue-400">Gateway Hub Realtime</span>
+      </div>
+      <h3 class="text-lg lg:text-xl font-bold tracking-tight text-white">Monitoring Server Pulsa &amp; H2H Engine</h3>
+      <p class="text-xs text-slate-400 max-w-xl">
+        Kelola transaksi agen, sinkronisasi harga otomatis, dan pantau saldo provider secara terpusat.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2 pt-2 lg:pt-0">
+      <form action="/admin/products/sync" method="POST" class="inline">
+        <button type="submit" class="btn btn-sm bg-white/10 hover:bg-white/20 text-white border border-white/10 text-xs font-semibold gap-1.5">
+          <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          <span>Sync Produk</span>
+        </button>
+      </form>
+
+      <a href="/admin/transactions" class="btn btn-sm bg-blue-600 hover:bg-blue-500 text-white border-0 text-xs font-bold shadow-md shadow-blue-600/30 gap-1.5">
+        <span>Semua Transaksi</span>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- 5 Primary Metric Cards (Fintech Grid) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+  
+  <!-- Saldo Provider Digiflazz (Primary Focus) -->
+  <div class="metric-card bg-gradient-to-br from-blue-50/80 to-indigo-50/40 dark:from-blue-950/30 dark:to-slate-900 border-blue-200/80 dark:border-blue-800/60 shadow-sm relative overflow-hidden">
+    <div class="flex items-center justify-between">
+      <span class="metric-label font-bold text-blue-700 dark:text-blue-300">Saldo Digiflazz H2H</span>
+      <div class="metric-icon-box bg-blue-600 text-white shadow-md shadow-blue-500/20">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+      </div>
+    </div>
+    <div class="metric-value font-mono font-extrabold text-blue-600 dark:text-blue-400">
+      <%= typeof formatRupiah !== 'undefined' ? formatRupiah(locals.digiBalance || 0) : 'Rp ' + (locals.digiBalance || 0) %>
+    </div>
+    <div class="flex items-center justify-between mt-2.5 text-xs">
+      <div class="flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-[11px] text-slate-500 font-medium">Gateway Digiflazz</span>
+      </div>
+      <% if (stats.providers && stats.providers.length > 0) { %>
+        <form action="/admin/providers/<%= stats.providers[0].id %>/check-balance" method="POST" class="inline">
+          <button type="submit" class="text-[11px] font-bold text-blue-600 hover:text-blue-800 dark:text-blue-400 hover:underline flex items-center gap-1" title="Cek saldo live ke Digiflazz">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            <span>Cek Live</span>
+          </button>
+        </form>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Transaksi Hari Ini -->
+  <div class="metric-card">
+    <div class="flex items-center justify-between">
+      <span class="metric-label">Transaksi Hari Ini</span>
+      <div class="metric-icon-box bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+      </div>
+    </div>
+    <div class="metric-value text-slate-900 dark:text-white"><%= stats.transactions_today || 0 %></div>
+    <div class="flex items-center gap-2 mt-2.5 text-xs">
+      <span class="badge-status badge-status-success font-mono font-bold">✓ <%= stats.success_today || 0 %> Sukses</span>
+      <span class="badge-status badge-status-pending font-mono font-bold">⏳ <%= stats.pending_today || 0 %> Pending</span>
+    </div>
+  </div>
+
+  <!-- Omset Hari Ini -->
+  <div class="metric-card">
+    <div class="flex items-center justify-between">
+      <span class="metric-label">Volume Omset Hari Ini</span>
+      <div class="metric-icon-box bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      </div>
+    </div>
+    <div class="metric-value text-emerald-600"><%= formatRupiah(stats.omset_today || 0) %></div>
+    <p class="text-[11px] text-slate-500 mt-2.5">Total perputaran uang transaksi sukses</p>
+  </div>
+
+  <!-- Profit Hari Ini -->
+  <div class="metric-card">
+    <div class="flex items-center justify-between">
+      <span class="metric-label">Margin Profit Server</span>
+      <div class="metric-icon-box bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+      </div>
+    </div>
+    <div class="metric-value text-indigo-600"><%= formatRupiah(stats.profit_today || 0) %></div>
+    <p class="text-[11px] text-slate-500 mt-2.5">Keuntungan bersih dari selisih markup</p>
+  </div>
+
+  <!-- Agen Terdaftar -->
+  <div class="metric-card">
+    <div class="flex items-center justify-between">
+      <span class="metric-label">Jaringan Agen</span>
+      <div class="metric-icon-box bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+      </div>
+    </div>
+    <div class="metric-value text-slate-900 dark:text-white"><%= stats.active_agents || 0 %> <span class="text-xs font-normal text-slate-400">Akun</span></div>
+    <div class="mt-2.5 text-xs">
+      <% if (stats.pending_deposits > 0) { %>
+        <a href="/admin/deposits?status=pending" class="text-amber-600 font-bold hover:underline inline-flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+          <span><%= stats.pending_deposits %> Tiket Deposit Pending &rarr;</span>
+        </a>
+      <% } else { %>
+        <span class="text-slate-400">Semua deposit terverifikasi</span>
+      <% } %>
+    </div>
+  </div>
+
+</div>
+
+<!-- Provider Balances Card -->
+<div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+    <div>
+      <h4 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+        <span>Status Hub &amp; Saldo Provider Digiflazz</span>
+      </h4>
+      <p class="text-xs text-slate-500">Saldo deposit H2H yang tersedia untuk memproses transaksi pulsa &amp; PPOB seluruh agen.</p>
+    </div>
+    <a href="/admin/providers" class="text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center gap-1">
+      <span>Kelola Kredensial Provider</span>
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    <% if (stats.providers && stats.providers.length > 0) { %>
+      <% stats.providers.forEach(p => { %>
+        <div class="p-4 rounded-xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 flex items-center justify-between">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-xs text-slate-700 dark:text-slate-300"><%= p.label %></span>
+              <% if (p.status === 'ok') { %>
+                <span class="badge-status badge-status-success text-[10px]">Terhubung</span>
+              <% } else if (p.status === 'unconfigured') { %>
+                <span class="badge-status badge-status-pending text-[10px]">Belum Diatur</span>
+              <% } else { %>
+                <span class="badge-status badge-status-pending text-[10px]" title="<%= p.error || '' %>">Offline / Standby</span>
+              <% } %>
+            </div>
+            <p class="text-xl font-bold font-mono text-slate-900 dark:text-white mt-1">
+              <%= formatRupiah(p.balance || 0) %>
+            </p>
+          </div>
+          <form action="/admin/providers/<%= p.id %>/check-balance" method="POST">
+            <button type="submit" class="btn btn-xs bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-xs font-semibold gap-1 text-slate-700 dark:text-slate-200 shadow-sm" title="Cek Saldo Sekarang">
+              <svg class="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+              <span>Refresh Saldo</span>
+            </button>
+          </form>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+</div>
+
+<!-- Two-Column Grid: Recent Transactions & Pending Deposits -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  
+  <!-- Transaksi Terbaru Table (2 Cols) -->
+  <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm flex flex-col justify-between">
+    <div>
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h4 class="font-bold text-sm text-slate-900 dark:text-white">10 Transaksi Live Terakhir</h4>
+          <p class="text-xs text-slate-500">Aktivitas pembelian dari seluruh jaringan agen.</p>
+        </div>
+        <a href="/admin/transactions" class="text-xs font-bold text-blue-600 hover:underline inline-flex items-center gap-1">
+          <span>Semua</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </a>
+      </div>
+
+      <!-- Responsive Table Container -->
+      <div class="overflow-x-auto -mx-5 px-5">
+        <table class="fintech-table">
+          <thead>
+            <tr>
+              <th>Waktu</th>
+              <th>Agen</th>
+              <th>Produk</th>
+              <th>Tujuan</th>
+              <th>Harga</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (recentTransactions && recentTransactions.length > 0) { %>
+              <% recentTransactions.forEach(t => { %>
+                <tr>
+                  <td class="whitespace-nowrap text-xs text-slate-500 font-mono"><%= formatDateTime(t.created_at) %></td>
+                  <td>
+                    <div class="font-bold text-xs text-slate-900 dark:text-white"><%= t.agent_name || 'Admin' %></div>
+                  </td>
+                  <td>
+                    <div class="text-xs font-medium max-w-[140px] truncate" title="<%= t.product_name %>"><%= t.product_name %></div>
+                  </td>
+                  <td>
+                    <button type="button" onclick="copyToClipboard('<%= t.target %>', 'Nomor Tujuan')" class="btn-copy" title="Salin Nomor">
+                      <span><%= t.target %></span>
+                      <svg class="w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+                    </button>
+                  </td>
+                  <td class="font-mono text-xs font-bold text-slate-900 dark:text-white"><%= formatRupiah(t.price_sell) %></td>
+                  <td>
+                    <% if (t.status === 'success') { %>
+                      <span class="badge-status badge-status-success">
+                        <span class="dot-pulse dot-pulse-success"></span> Sukses
+                      </span>
+                    <% } else if (t.status === 'pending') { %>
+                      <span class="badge-status badge-status-pending">
+                        <span class="dot-pulse dot-pulse-pending"></span> Pending
+                      </span>
+                    <% } else { %>
+                      <span class="badge-status badge-status-failed">
+                        <span class="dot-pulse dot-pulse-failed"></span> Gagal
+                      </span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="6" class="text-center py-8 text-xs text-slate-400">Belum ada aktivitas transaksi hari ini.</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deposit Approval Queue (1 Col) -->
+  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm flex flex-col justify-between">
+    <div>
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h4 class="font-bold text-sm text-slate-900 dark:text-white">Antrean Deposit</h4>
+          <p class="text-xs text-slate-500">Tiket menunggu konfirmasi.</p>
+        </div>
+        <a href="/admin/deposits" class="text-xs font-bold text-blue-600 hover:underline">Semua</a>
+      </div>
+
+      <div class="space-y-3">
+        <% if (recentDeposits && recentDeposits.length > 0) { %>
+          <% recentDeposits.forEach(d => { %>
+            <div class="p-3.5 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/60 dark:bg-amber-950/20 flex items-center justify-between gap-3">
+              <div class="space-y-0.5 overflow-hidden">
+                <p class="text-xs font-bold text-slate-900 dark:text-white truncate"><%= d.agent_name %></p>
+                <p class="text-[11px] font-mono text-slate-500"><%= d.deposit_code %></p>
+                <p class="text-sm font-bold font-mono text-blue-600 dark:text-blue-400"><%= formatRupiah(d.amount) %></p>
+              </div>
+              <div class="flex flex-col gap-1.5 flex-shrink-0">
+                <form action="/admin/deposits/<%= d.id %>/approve" method="POST">
+                  <button type="submit" class="btn btn-xs bg-emerald-600 hover:bg-emerald-500 text-white border-0 font-semibold px-3">
+                    Setujui
+                  </button>
+                </form>
+                <a href="/admin/deposits" class="btn btn-xs btn-ghost text-slate-600 dark:text-slate-400 text-center">
+                  Detail
+                </a>
+              </div>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="py-12 text-center text-slate-400">
+            <svg class="w-10 h-10 mx-auto text-slate-300 dark:text-slate-700 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <p class="text-xs font-medium">Antrean deposit bersih!</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<%- include('../partials/footer') %>

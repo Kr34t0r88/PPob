@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="<%= store.logo || '/public/images/favicon.png' %>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- DaisyUI & Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #080C14;
+      color: #E2E8F0;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card-hover:hover {
+      border-color: rgba(59, 130, 246, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px -10px rgba(37, 99, 235, 0.3);
+    }
+    .glow-accent {
+      box-shadow: 0 0 35px -5px rgba(59, 130, 246, 0.3);
+    }
+    /* Hide scrollbar for category tabs */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+  <!-- ── Top Navbar ─────────────────────────────────────────────────────────── -->
+  <header class="sticky top-0 z-50 bg-[#080C14]/90 backdrop-blur-md border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <a href="/" class="flex items-center gap-3 group">
+        <% if (store.logo) { %>
+          <img src="<%= store.logo %>" alt="<%= store.name %>" class="w-10 h-10 rounded-xl object-cover shadow-lg border border-slate-700/50" />
+        <% } else { %>
+          <img src="/public/images/logo-brand.jpg" alt="<%= store.name %>" class="w-10 h-10 rounded-xl object-cover shadow-lg border border-slate-700/50 group-hover:scale-105 transition-transform" />
+        <% } %>
+        <div>
+          <div class="text-base font-extrabold text-white tracking-tight flex items-center gap-1.5">
+            <span><%= store.name %></span>
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Sistem Online 24 Jam"></span>
+          </div>
+          <p class="text-[10px] text-slate-400 font-medium hidden sm:block"><%= store.tagline %></p>
+        </div>
+      </a>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-2.5">
+        <% if (store.csWhatsapp) { 
+             const waHeaderNum = (store.csWhatsappFormatted || store.csWhatsapp || '').replace(/\D/g, '').replace(/^0/, '62');
+             const waHeaderMsg = encodeURIComponent(`Halo Admin ${store.name || 'Juragan Topup'}, saya butuh bantuan top-up.`);
+        %>
+          <a href="https://wa.me/<%= waHeaderNum %>?text=<%= waHeaderMsg %>" target="_blank" rel="noopener" class="btn btn-sm btn-ghost text-slate-300 hover:text-emerald-400 hover:bg-emerald-950/30 border border-slate-800 text-xs font-semibold gap-1.5 inline-flex">
+            <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.97.587 1.942.898 2.796.898h.005c3.181 0 5.768-2.587 5.768-5.766.001-3.181-2.585-5.785-5.773-5.785zm3.385 8.169c-.141.397-.714.733-1.018.777-.306.046-.701.077-1.127-.061-.734-.238-1.637-.777-2.381-1.521-.744-.744-1.283-1.647-1.521-2.381-.138-.426-.107-.821-.061-1.127.044-.304.38-.877.777-1.018.146-.052.285-.046.398-.015.112.031.25.139.313.266.14.286.478 1.168.521 1.256.043.088.073.19.014.306-.059.116-.118.19-.204.288-.086.098-.182.203-.26.288-.087.095-.178.198-.077.371.101.173.448.74 1.012 1.243.725.646 1.336.847 1.527.942.191.095.304.08.418-.052.114-.132.489-.57.621-.766.132-.196.264-.164.443-.098.179.066 1.137.536 1.332.634.195.098.326.146.374.229.048.083.048.481-.093.878zM12 2C6.477 2 2 6.477 2 12c0 1.891.524 3.66 1.434 5.178L2 22l4.98-1.306C8.423 21.536 10.154 22 12 22c5.523 0 10-6.477 10-10S17.523 2 12 2z"/></svg>
+            <span class="hidden sm:inline">Bantuan CS</span>
+          </a>
+        <% } %>
+
+
+
+        <!-- Menu Daftar Harga Mitra -->
+        <a href="/pricelist" class="btn btn-sm btn-ghost text-slate-300 hover:text-sky-400 hover:bg-sky-950/30 border border-slate-800 text-xs font-semibold gap-1.5 hidden sm:inline-flex">
+          <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+          <span>Daftar Harga</span>
+        </a>
+
+        <!-- Tombol Daftar Agen -->
+        <a href="/register" class="btn btn-sm bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white border-0 text-xs font-bold gap-1.5 shadow-md shadow-sky-600/20">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+          <span class="hidden sm:inline">Daftar</span> Agen
+        </a>
+
+        <% if (store.showApkDownload) { %>
+          <a href="<%= store.appDownloadUrl %>" class="btn btn-sm bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-semibold gap-1.5 hidden md:inline-flex">
+            <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            <span class="hidden sm:inline">Download</span> APK
+          </a>
+        <% } %>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ── Announcement Marquee ────────────────────────────────────────────────── -->
+  <% if (store.announcement) { %>
+    <div class="bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 border-b border-blue-900/40 py-2 px-4">
+      <div class="max-w-7xl mx-auto flex items-center gap-2 text-xs text-blue-200">
+        <span class="badge badge-sm bg-blue-600 text-white font-extrabold uppercase tracking-wider text-[9px] px-2 border-0">INFO</span>
+        <marquee class="font-medium text-slate-300" scrollamount="6"><%= store.announcement %></marquee>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- ── Main Content Container ──────────────────────────────────────────────── -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+    
+    <!-- Hero Banner Carousel / Showcase -->
+    <div class="relative rounded-3xl overflow-hidden glass-card border border-slate-800 shadow-2xl group">
+      <div class="grid grid-cols-1 lg:grid-cols-12 items-center">
+        
+        <!-- Left Content -->
+        <div class="lg:col-span-7 p-6 sm:p-10 z-10 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-600/20 border border-blue-500/40 text-blue-400 text-xs font-bold">
+            <span class="w-2 h-2 rounded-full bg-blue-400 animate-ping"></span>
+            <span>⚡ INSTANT DELIVERY 24 JAM NONSTOP</span>
+          </div>
+          <h1 class="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
+            Top-Up Game, Pulsa &amp; Listrik <br class="hidden sm:inline"/>
+            <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-cyan-300 to-indigo-300">Termurah, Otomatis &amp; Cepat</span>
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
+            Pilih produk favorit Anda, masukkan No. HP atau ID Game, bayar dengan <b>Dynamic QRIS</b> (BCA, Mandiri, BRI, BNI, DANA, GoPay, OVO, ShopeePay). Transaksi langsung diproses detik itu juga!
+          </p>
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <button type="button" onclick="selectCategoryDirect('Game')" class="btn btn-sm bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold border-0 text-xs shadow-lg shadow-blue-600/30 gap-1.5">
+              <span>🎮 Top Up Game</span>
+            </button>
+            <button type="button" onclick="selectCategoryDirect('Pulsa')" class="btn btn-sm bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-semibold gap-1.5">
+              <span>📱 Beli Pulsa &amp; Data</span>
+            </button>
+            <button type="button" onclick="selectCategoryDirect('PLN')" class="btn btn-sm bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-semibold gap-1.5">
+              <span>⚡ Token PLN</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Visual Showcase -->
+        <div class="lg:col-span-5 p-4 sm:p-6 flex justify-center items-center">
+          <div class="relative w-full max-w-md aspect-[16/10] rounded-2xl overflow-hidden shadow-2xl border border-slate-700/60 group-hover:border-blue-500/50 transition-all duration-500">
+            <img src="/public/images/banner-hero-1.jpg" alt="Promo Top-Up Game & QRIS" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
+              <div class="flex items-center gap-2 text-white">
+                <span class="badge badge-sm bg-blue-600 text-white font-bold text-[10px] border-0">QRIS READY</span>
+                <span class="text-xs font-bold drop-shadow">Auto Verifikasi 24 Jam</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Category Filter Tabs ──────────────────────────────────────────────── -->
+    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+      <button type="button" onclick="filterCategory('ALL', this)" class="cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white transition-all whitespace-nowrap shadow-md shadow-blue-600/20">
+        ✨ Semua Produk
+      </button>
+      <button type="button" onclick="filterCategory('Game', this)" class="cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-all whitespace-nowrap">
+        🎮 Voucher Game
+      </button>
+      <button type="button" onclick="filterCategory('Pulsa', this)" class="cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-all whitespace-nowrap">
+        📱 Pulsa Reguler
+      </button>
+      <button type="button" onclick="filterCategory('Data', this)" class="cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-all whitespace-nowrap">
+        🌐 Paket Data Internet
+      </button>
+      <button type="button" onclick="filterCategory('PLN', this)" class="cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-all whitespace-nowrap">
+        ⚡ Token PLN Listrik
+      </button>
+      <button type="button" onclick="filterCategory('E-Money', this)" class="cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-all whitespace-nowrap">
+        💳 E-Money &amp; Dompet Digital
+      </button>
+    </div>
+
+    <!-- ── Game Showcase Grid (UniPin / Codashop Cards) ──────────────────────── -->
+    <div id="section-games" class="space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base font-extrabold text-white tracking-tight flex items-center gap-2">
+          <span>🎮 Kategori &amp; Game Pilihan</span>
+          <span class="badge badge-xs badge-info font-bold">Populer 24 Jam</span>
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
+        
+        <!-- Mobile Legends -->
+        <div onclick="selectGame('Mobile Legends')" class="glass-card glass-card-hover rounded-2xl p-2.5 cursor-pointer text-center group transition-all">
+          <div class="w-full aspect-square rounded-xl overflow-hidden mb-2 relative shadow-lg">
+            <img src="/public/images/game-mlbb.jpg" alt="Mobile Legends" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+            <span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-mono text-amber-400 font-bold backdrop-blur-sm">MLBB</span>
+          </div>
+          <h3 class="text-xs font-bold text-white group-hover:text-blue-400 transition-colors truncate">Mobile Legends</h3>
+          <p class="text-[10px] text-slate-400 font-medium">Diamonds</p>
+        </div>
+
+        <!-- Free Fire -->
+        <div onclick="selectGame('Free Fire')" class="glass-card glass-card-hover rounded-2xl p-2.5 cursor-pointer text-center group transition-all">
+          <div class="w-full aspect-square rounded-xl overflow-hidden mb-2 relative shadow-lg">
+            <img src="/public/images/game-ff.jpg" alt="Free Fire" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+            <span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-mono text-orange-400 font-bold backdrop-blur-sm">FF</span>
+          </div>
+          <h3 class="text-xs font-bold text-white group-hover:text-blue-400 transition-colors truncate">Free Fire</h3>
+          <p class="text-[10px] text-slate-400 font-medium">Diamonds</p>
+        </div>
+
+        <!-- PUBG Mobile -->
+        <div onclick="selectGame('PUBG')" class="glass-card glass-card-hover rounded-2xl p-2.5 cursor-pointer text-center group transition-all">
+          <div class="w-full aspect-square rounded-xl overflow-hidden mb-2 relative shadow-lg">
+            <img src="/public/images/game-pubg.jpg" alt="PUBG Mobile" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+            <span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-mono text-yellow-400 font-bold backdrop-blur-sm">PUBG</span>
+          </div>
+          <h3 class="text-xs font-bold text-white group-hover:text-blue-400 transition-colors truncate">PUBG Mobile</h3>
+          <p class="text-[10px] text-slate-400 font-medium">UC Voucher</p>
+        </div>
+
+        <!-- Genshin Impact -->
+        <div onclick="selectGame('Genshin')" class="glass-card glass-card-hover rounded-2xl p-2.5 cursor-pointer text-center group transition-all">
+          <div class="w-full aspect-square rounded-xl overflow-hidden mb-2 relative shadow-lg">
+            <img src="/public/images/game-genshin.jpg" alt="Genshin Impact" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+            <span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-mono text-cyan-400 font-bold backdrop-blur-sm">GENSHIN</span>
+          </div>
+          <h3 class="text-xs font-bold text-white group-hover:text-blue-400 transition-colors truncate">Genshin Impact</h3>
+          <p class="text-[10px] text-slate-400 font-medium">Genesis Crystal</p>
+        </div>
+
+        <!-- Token PLN -->
+        <div onclick="selectCategoryDirect('PLN')" class="glass-card glass-card-hover rounded-2xl p-2.5 cursor-pointer text-center group transition-all">
+          <div class="w-full aspect-square rounded-xl overflow-hidden mb-2 relative shadow-lg">
+            <img src="/public/images/cat-pln.jpg" alt="Token PLN" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+            <span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-mono text-yellow-300 font-bold backdrop-blur-sm">PLN</span>
+          </div>
+          <h3 class="text-xs font-bold text-white group-hover:text-blue-400 transition-colors truncate">Token PLN</h3>
+          <p class="text-[10px] text-slate-400 font-medium">Listrik Prabayar</p>
+        </div>
+
+        <!-- Dompet Digital / DANA -->
+        <div onclick="selectCategoryDirect('E-Money')" class="glass-card glass-card-hover rounded-2xl p-2.5 cursor-pointer text-center group transition-all">
+          <div class="w-full aspect-square rounded-xl overflow-hidden mb-2 relative shadow-lg">
+            <img src="/public/images/cat-emoney.jpg" alt="E-Wallet DANA" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+            <span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-mono text-cyan-300 font-bold backdrop-blur-sm">E-WALLET</span>
+          </div>
+          <h3 class="text-xs font-bold text-white group-hover:text-blue-400 transition-colors truncate">E-Wallet</h3>
+          <p class="text-[10px] text-slate-400 font-medium">DANA/GoPay/OVO</p>
+        </div>
+
+        <!-- Pulsa & Paket Data -->
+        <div onclick="selectCategoryDirect('Pulsa')" class="glass-card glass-card-hover rounded-2xl p-2.5 cursor-pointer text-center group transition-all">
+          <div class="w-full aspect-square rounded-xl overflow-hidden mb-2 relative shadow-lg">
+            <img src="/public/images/cat-pulsa.jpg" alt="Pulsa & Data" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+            <span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-mono text-blue-300 font-bold backdrop-blur-sm">TELCO</span>
+          </div>
+          <h3 class="text-xs font-bold text-white group-hover:text-blue-400 transition-colors truncate">Pulsa &amp; Data</h3>
+          <p class="text-[10px] text-slate-400 font-medium">Semua Operator</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Interactive Top-Up Order Engine (3 Steps) ────────────────────────── -->
+    <div id="order-section" class="scroll-mt-20">
+      <div class="glass-card rounded-3xl p-5 sm:p-8 border border-slate-800 space-y-6">
+        
+        <div class="flex items-center justify-between pb-4 border-b border-slate-800/80">
+          <div>
+            <h2 class="text-lg font-extrabold text-white tracking-tight flex items-center gap-2">
+              <span id="label-selected-title">🚀 Formulir Pembelian Langsung</span>
+            </h2>
+            <p class="text-xs text-slate-400">Pilih nominal, isi nomor/ID tujuan, dan selesaikan pembayaran QRIS.</p>
+          </div>
+          <div id="badge-selected-cat" class="badge badge-primary font-bold text-xs uppercase px-3 py-3">PULSA &amp; GAME</div>
+        </div>
+
+        <!-- STEP 1: Target Destination Input -->
+        <div class="space-y-2">
+          <label class="text-xs font-bold uppercase tracking-wider text-blue-400 flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-blue-600/30 border border-blue-500/40 text-blue-400 flex items-center justify-center text-[10px]">1</span>
+            <span>Masukkan Data Tujuan (No. HP / ID Akun Game)</span>
+          </label>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="input-target-grid">
+            <div class="sm:col-span-2 relative" id="wrapper-target-id">
+              <input type="text" id="input-target-id" oninput="handleTargetInput(this.value)" placeholder="Contoh: 08123456789 atau User ID Game..." class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono transition-all" required />
+              
+              <!-- Auto-detected Operator Badge -->
+              <div id="detected-brand-badge" class="absolute right-3 top-1/2 -translate-y-1/2 hidden">
+                <span class="badge badge-sm bg-blue-600/30 border border-blue-500/50 text-blue-300 font-bold font-mono text-[10px]">TELKOMSEL</span>
+              </div>
+            </div>
+
+            <!-- Server/Zone ID for Game (Hidden by default, shown for Games) -->
+            <div id="wrapper-target-zone" class="hidden">
+              <input type="text" id="input-target-zone" placeholder="Zone / Server ID (Contoh: 2048)" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono transition-all" />
+            </div>
+          </div>
+          <p id="target-helper-text" class="text-[11px] text-slate-500">Ketik nomor HP untuk pulsa/data, ID Pelanggan untuk PLN, atau User ID untuk Game.</p>
+        </div>
+
+        <!-- STEP 2: Select Product Denomination Grid -->
+        <div class="space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <label class="text-xs font-bold uppercase tracking-wider text-blue-400 flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-blue-600/30 border border-blue-500/40 text-blue-400 flex items-center justify-center text-[10px]">2</span>
+              <span>Pilih Nominal Produk</span>
+            </label>
+            <div class="relative max-w-xs w-full">
+              <input type="text" id="product-search-input" oninput="handleProductSearch(this.value)" placeholder="🔍 Cari nominal atau produk..." class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-1.5 text-xs text-white placeholder-slate-500 font-mono focus:outline-none focus:border-blue-500 transition-all" />
+            </div>
+          </div>
+
+          <!-- Brand / Operator Filter Chips -->
+          <div id="brand-chips-container" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+            <!-- Rendered dynamically by JS -->
+          </div>
+
+          <!-- Product Grid Cards -->
+          <div id="product-cards-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3">
+            <!-- Rendered dynamically by JS -->
+          </div>
+        </div>
+
+        <!-- STEP 3: Buyer WhatsApp & Checkout Button -->
+        <div class="space-y-4 pt-2 border-t border-slate-800/80">
+          <label class="text-xs font-bold uppercase tracking-wider text-blue-400 flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-blue-600/30 border border-blue-500/40 text-blue-400 flex items-center justify-center text-[10px]">3</span>
+            <span>Nomor WhatsApp &amp; Konfirmasi Pembayaran</span>
+          </label>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1 font-medium">Nomor WhatsApp Pembeli (Untuk Kirim Bukti &amp; SN)</label>
+              <input type="tel" id="input-buyer-phone" placeholder="08xxxxxxxxxx (Opsional)" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 font-mono" />
+            </div>
+
+            <!-- Total Box & Action Button -->
+            <div class="flex flex-col justify-end space-y-2">
+              <div class="flex items-center justify-between p-3.5 rounded-xl bg-slate-950/90 border border-slate-800">
+                <span class="text-xs text-slate-400 font-medium">Total Pembayaran:</span>
+                <span id="label-selected-price" class="text-sm font-black font-mono text-emerald-400">Rp 0</span>
+              </div>
+
+              <button type="button" id="btn-submit-order" onclick="submitPublicOrder()" class="btn bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold border-0 shadow-lg shadow-blue-600/30 text-sm gap-2 h-11">
+                <span>⚡ Beli Sekarang via QRIS</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Banner Ajakan Kemitraan Agen ────────────────────────────────────── -->
+    <div class="relative rounded-3xl overflow-hidden p-6 sm:p-8 bg-gradient-to-r from-sky-950 via-slate-900 to-indigo-950 border border-sky-800/40 shadow-2xl">
+      <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+        <div class="space-y-2 text-center md:text-left">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 text-sky-400 text-xs font-bold">
+            <span>🤝 Peluang Usaha Pulsa &amp; PPOB</span>
+          </div>
+          <h3 class="text-xl sm:text-2xl font-black text-white">
+            Ingin Jualan Pulsa &amp; Top-Up dengan Harga Modal Termurah?
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-300 max-w-2xl">
+            Daftar sebagai Agen Resmi sekarang juga! Dapatkan akses login APK via QR Code, deposit otomatis 24 jam, dan margin keuntungan maksimal tanpa biaya pendaftaran.
+          </p>
+        </div>
+        <div class="shrink-0 flex flex-wrap items-center gap-3">
+          <a href="/register" class="btn btn-primary bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white border-0 font-extrabold text-xs sm:text-sm px-6 shadow-xl shadow-sky-600/30 gap-2">
+            <span>Daftar Jadi Agen Sekarang</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────────────────────────── -->
+  <footer class="bg-[#05080E] border-t border-slate-800/80 mt-12 py-10 text-slate-400 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        
+        <div class="md:col-span-2 space-y-3">
+          <div class="text-base font-extrabold text-white"><%= store.name %></div>
+          <p class="text-slate-400 leading-relaxed max-w-md"><%= store.tagline %>. Layanan pengisian pulsa, paket kuota data internet, token PLN prabayar, dan diamond voucher game instan terpercaya 24 jam nonstop.</p>
+          <div class="flex items-center gap-2 pt-2">
+            <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 font-mono text-[10px] text-slate-300">🔒 SSL 256-bit Encrypted</span>
+            <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 font-mono text-[10px] text-emerald-400">⚡ Instant H2H Engine</span>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-white mb-3 uppercase tracking-wider text-[11px]">Metode Pembayaran</h4>
+          <p class="text-slate-400 text-[11px] leading-relaxed">
+            Mendukung pembayaran otomatis melalui <b>QRIS Dinamis</b> dari semua aplikasi mobile banking (BCA, Mandiri, BRI, BNI, BSI) dan E-Wallet (DANA, GoPay, OVO, ShopeePay, LinkAja).
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-white mb-3 uppercase tracking-wider text-[11px]">Bantuan &amp; Kontak</h4>
+          <ul class="space-y-2 text-[11px]">
+            <% if (store.csWhatsapp) { 
+                 const waFooterNum = (store.csWhatsappFormatted || store.csWhatsapp || '').replace(/\D/g, '').replace(/^0/, '62');
+                 const waFooterMsg = encodeURIComponent(`Halo Admin ${store.name || 'Juragan Topup'}, saya ingin bertanya tentang layanan top-up.`);
+            %>
+              <li><a href="https://wa.me/<%= waFooterNum %>?text=<%= waFooterMsg %>" target="_blank" class="hover:text-white transition-colors flex items-center gap-1.5">💬 WhatsApp CS: <%= store.csWhatsapp %></a></li>
+            <% } %>
+
+            <% if (store.showApkDownload) { %>
+              <li><a href="<%= store.appDownloadUrl %>" class="hover:text-white transition-colors flex items-center gap-1.5">📱 Download APK Mitra Agen</a></li>
+            <% } %>
+            <li><span class="text-slate-500">🛡️ Keamanan Data Terenkripsi</span></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="pt-6 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-3 text-slate-500 text-[11px]">
+        <div>&copy; <%= new Date().getFullYear() %> <b><%= store.name %></b>. All rights reserved.</div>
+        <div class="font-mono text-slate-400 font-semibold">Pengembang: ALIJAYA NET (081947215703)</div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ── Client-Side Application Script ────────────────────────────────────── -->
+  <script>
+    const allProducts = <%- productsJson %>;
+    let currentCategory = 'ALL';
+    let currentBrand = '';
+    let searchQuery = '';
+    let selectedSku = '';
+    let selectedProduct = null;
+
+    // Operator Telco Prefixes
+    const telcoMap = {
+      '0811': 'Telkomsel', '0812': 'Telkomsel', '0813': 'Telkomsel', '0821': 'Telkomsel', '0822': 'Telkomsel', '0823': 'Telkomsel', '0851': 'Telkomsel', '0852': 'Telkomsel', '0853': 'Telkomsel',
+      '0814': 'Indosat', '0815': 'Indosat', '0816': 'Indosat', '0855': 'Indosat', '0856': 'Indosat', '0857': 'Indosat', '0858': 'Indosat',
+      '0817': 'XL', '0818': 'XL', '0819': 'XL', '0859': 'XL', '0877': 'XL', '0878': 'XL',
+      '0831': 'Axis', '0832': 'Axis', '0833': 'Axis', '0838': 'Axis',
+      '0895': 'Tri', '0896': 'Tri', '0897': 'Tri', '0898': 'Tri', '0899': 'Tri',
+      '0881': 'Smartfren', '0882': 'Smartfren', '0883': 'Smartfren', '0884': 'Smartfren', '0885': 'Smartfren', '0886': 'Smartfren', '0887': 'Smartfren', '0888': 'Smartfren', '0889': 'Smartfren'
+    };
+
+    function formatRp(num) {
+      return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
+    }
+
+    // Normalisasi kategori Digiflazz agar konsisten
+    function normalizeCategory(cat) {
+      if (!cat) return 'Lainnya';
+      const c = String(cat).trim().toLowerCase();
+      if (c === 'game' || c === 'games' || c.includes('game') || c.includes('voucher game')) return 'Game';
+      if (c === 'pulsa' || c.includes('pulsa')) return 'Pulsa';
+      if (c === 'data' || c.includes('data') || c.includes('paket') || c.includes('internet') || c.includes('kuota')) return 'Data';
+      if (c === 'pln' || c.includes('pln') || c.includes('listrik')) return 'PLN';
+      if (c === 'e-money' || c === 'emoney' || c.includes('money') || c.includes('wallet') || c.includes('dana') || c.includes('gopay') || c.includes('ovo') || c.includes('shopee')) return 'E-Money';
+      if (c.includes('voucher') || c.includes('aktivasi')) return 'Voucher';
+      if (c.includes('sms') || c.includes('telp')) return 'SMS & Telpon';
+      if (c.includes('masa') || c.includes('aktif')) return 'Masa Aktif';
+      if (c.includes('tv') || c.includes('televisi')) return 'TV';
+      return cat;
+    }
+
+    // Pencocokan brand fleksibel (case-insensitive & aliases)
+    function matchBrand(productBrand, targetBrand) {
+      if (!targetBrand) return true;
+      const pb = String(productBrand || '').trim().toLowerCase();
+      const tb = String(targetBrand || '').trim().toLowerCase();
+      if (pb === tb) return true;
+      if (pb.includes(tb) || tb.includes(pb)) return true;
+      
+      // Game Aliases
+      if (tb === 'mobile legends' || tb === 'mlbb' || tb === 'ml') {
+        return pb.includes('mobile') || pb.includes('legends') || pb.includes('mlbb');
+      }
+      if (tb === 'free fire' || tb === 'ff') {
+        return pb.includes('free') || pb.includes('fire') || pb.includes('ff');
+      }
+      if (tb === 'pubg' || tb === 'pubgm') {
+        return pb.includes('pubg');
+      }
+      if (tb === 'genshin' || tb === 'genshin impact') {
+        return pb.includes('genshin');
+      }
+      if (tb === 'garena') {
+        return pb.includes('garena');
+      }
+      return false;
+    }
+
+    function filterCategory(cat, btnElem) {
+      currentCategory = cat;
+      currentBrand = '';
+      searchQuery = '';
+      const searchInput = document.getElementById('product-search-input');
+      if (searchInput) searchInput.value = '';
+      
+      // Update tab styles
+      document.querySelectorAll('.cat-tab').forEach(b => {
+        b.className = 'cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-all whitespace-nowrap';
+      });
+      if (btnElem) {
+        btnElem.className = 'cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white transition-all whitespace-nowrap shadow-md shadow-blue-600/20';
+      }
+
+      document.getElementById('badge-selected-cat').textContent = cat === 'ALL' ? 'SEMUA PRODUK' : cat.toUpperCase();
+      
+      // Toggle Zone ID for Game
+      if (cat === 'Game') {
+        document.getElementById('wrapper-target-zone').classList.remove('hidden');
+        document.getElementById('wrapper-target-id').className = 'relative';
+        document.getElementById('input-target-id').placeholder = 'User ID Akun Game...';
+        document.getElementById('target-helper-text').textContent = 'Masukkan User ID dan Zone/Server ID akun game Anda.';
+      } else {
+        document.getElementById('wrapper-target-zone').classList.add('hidden');
+        document.getElementById('wrapper-target-id').className = 'sm:col-span-2 relative';
+        if (cat === 'PLN') {
+          document.getElementById('input-target-id').placeholder = 'Nomor Meter / ID Pelanggan PLN...';
+          document.getElementById('target-helper-text').textContent = 'Masukkan 11-12 digit No. Meter atau ID Pelanggan PLN.';
+        } else {
+          document.getElementById('input-target-id').placeholder = 'Nomor HP (Contoh: 08123456789)...';
+          document.getElementById('target-helper-text').textContent = 'Ketik nomor HP tujuan (operator akan terdeteksi otomatis).';
+        }
+      }
+
+      renderBrandChips();
+      renderProducts();
+    }
+
+    function selectGame(brandName) {
+      filterCategory('Game');
+      currentBrand = brandName;
+      document.getElementById('label-selected-title').textContent = '🎮 Top Up ' + brandName;
+      renderBrandChips();
+      renderProducts();
+      document.getElementById('order-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function selectCategoryDirect(cat) {
+      filterCategory(cat);
+      renderBrandChips();
+      renderProducts();
+      document.getElementById('order-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function handleProductSearch(val) {
+      searchQuery = (val || '').trim().toLowerCase();
+      renderProducts();
+    }
+
+    function renderBrandChips() {
+      const container = document.getElementById('brand-chips-container');
+      container.innerHTML = '';
+
+      let filtered = allProducts;
+      if (currentCategory !== 'ALL') {
+        filtered = filtered.filter(p => normalizeCategory(p.category) === currentCategory || p.category === currentCategory);
+      }
+
+      const brands = [...new Set(filtered.map(p => p.brand).filter(Boolean))];
+      if (brands.length <= 1) {
+        container.classList.add('hidden');
+        return;
+      }
+      container.classList.remove('hidden');
+
+      // 'Semua' chip
+      const allChip = document.createElement('button');
+      allChip.type = 'button';
+      allChip.className = `px-3 py-1 rounded-lg text-xs font-semibold ${!currentBrand ? 'bg-blue-600/30 border border-blue-500 text-blue-300' : 'bg-slate-900 border border-slate-800 text-slate-400'}`;
+      allChip.textContent = 'Semua';
+      allChip.onclick = () => { currentBrand = ''; renderBrandChips(); renderProducts(); };
+      container.appendChild(allChip);
+
+      brands.forEach(b => {
+        const isMatched = matchBrand(b, currentBrand);
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = `px-3 py-1 rounded-lg text-xs font-semibold ${isMatched && currentBrand ? 'bg-blue-600/30 border border-blue-500 text-blue-300' : 'bg-slate-900 border border-slate-800 text-slate-400'}`;
+        chip.textContent = b;
+        chip.onclick = () => { currentBrand = b; renderBrandChips(); renderProducts(); };
+        container.appendChild(chip);
+      });
+    }
+
+    function renderProducts() {
+      const grid = document.getElementById('product-cards-grid');
+      grid.innerHTML = '';
+
+      let list = allProducts;
+      
+      // 1. Filter Category
+      if (currentCategory !== 'ALL') {
+        list = list.filter(p => normalizeCategory(p.category) === currentCategory || p.category === currentCategory);
+      }
+
+      // 2. Filter Brand
+      if (currentBrand) {
+        list = list.filter(p => matchBrand(p.brand, currentBrand) || p.product_name.toLowerCase().includes(currentBrand.toLowerCase()));
+      }
+
+      // 3. Search Query
+      if (searchQuery) {
+        list = list.filter(p => {
+          const name = (p.product_name || '').toLowerCase();
+          const desc = (p.description || '').toLowerCase();
+          const sku = (p.sku || '').toLowerCase();
+          const brand = (p.brand || '').toLowerCase();
+          return name.includes(searchQuery) || desc.includes(searchQuery) || sku.includes(searchQuery) || brand.includes(searchQuery);
+        });
+      }
+
+      if (list.length === 0) {
+        grid.innerHTML = '<div class="col-span-full py-8 text-center text-xs text-slate-500">Tidak ada produk ditemukan. Coba ubah filter atau kata kunci pencarian.</div>';
+        return;
+      }
+
+      list.forEach(p => {
+        const isSelected = selectedSku === p.sku;
+        const card = document.createElement('div');
+        card.className = `p-3.5 rounded-2xl cursor-pointer transition-all border flex flex-col justify-between ${isSelected ? 'bg-blue-600/20 border-blue-500 shadow-lg shadow-blue-500/20' : 'bg-slate-900/90 border-slate-800 hover:border-slate-700 hover:bg-slate-850'}`;
+        card.onclick = () => selectProduct(p);
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-start justify-between gap-1 mb-1.5">
+              <span class="text-xs font-bold text-white line-clamp-1">${p.product_name}</span>
+              ${isSelected ? '<span class="text-blue-400 font-bold text-xs shrink-0">✓</span>' : ''}
+            </div>
+            <p class="text-[10px] text-slate-400 line-clamp-1 mb-2">${p.description || p.brand || p.category}</p>
+          </div>
+          <div class="text-xs font-black font-mono text-emerald-400 pt-1.5 border-t border-slate-800/80 mt-auto">${formatRp(p.price_public)}</div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function selectProduct(p) {
+      selectedSku = p.sku;
+      selectedProduct = p;
+      document.getElementById('label-selected-price').textContent = formatRp(p.price_public);
+      renderProducts();
+    }
+
+    function handleTargetInput(val) {
+      const digits = val.replace(/\D/g, '');
+      const badge = document.getElementById('detected-brand-badge');
+
+      if (digits.length >= 4 && (currentCategory === 'ALL' || currentCategory === 'Pulsa' || currentCategory === 'Data')) {
+        const prefix = digits.slice(0, 4);
+        const detectedBrand = telcoMap[prefix];
+        if (detectedBrand) {
+          badge.classList.remove('hidden');
+          badge.querySelector('span').textContent = detectedBrand.toUpperCase();
+          if (currentBrand !== detectedBrand) {
+            currentBrand = detectedBrand;
+            renderBrandChips();
+            renderProducts();
+          }
+          return;
+        }
+      }
+      badge.classList.add('hidden');
+    }
+
+    async function submitPublicOrder() {
+      const targetId = document.getElementById('input-target-id').value.trim();
+      const targetZone = document.getElementById('input-target-zone').value.trim();
+      const buyerPhone = document.getElementById('input-buyer-phone').value.trim();
+      const btn = document.getElementById('btn-submit-order');
+
+      if (!targetId) {
+        alert('Silakan masukkan nomor tujuan atau User ID akun Anda.');
+        document.getElementById('input-target-id').focus();
+        return;
+      }
+
+      if (!selectedSku || !selectedProduct) {
+        alert('Silakan pilih salah satu nominal produk di Langkah 2.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading loading-spinner loading-xs"></span> Menyiapkan QRIS...';
+
+      try {
+        const res = await fetch('/api/public/order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sku: selectedSku,
+            target_id: targetId,
+            target_zone: targetZone,
+            buyer_phone: buyerPhone
+          })
+        });
+
+        const data = await res.json();
+        if (data.success && data.redirect_url) {
+          window.location.href = data.redirect_url;
+        } else {
+          alert('Gagal membuat pesanan: ' + (data.error || 'Terjadi kesalahan'));
+          btn.disabled = false;
+          btn.innerHTML = '<span>⚡ Beli Sekarang via QRIS</span>';
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan jaringan: ' + err.message);
+        btn.disabled = false;
+        btn.innerHTML = '<span>⚡ Beli Sekarang via QRIS</span>';
+      }
+    }
+
+    // Inisialisasi awal
+    renderBrandChips();
+    renderProducts();
+  </script>
+
+  <!-- Live Chat Widget (Telegram Bridge) -->
+  <%- include('partials/livechat_widget') %>
+
+</body>
+</html>

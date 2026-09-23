@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="<%= store.logo || '/public/images/favicon.png' %>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- DaisyUI & Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #080C14;
+      color: #E2E8F0;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+  <!-- ── Top Navbar ─────────────────────────────────────────────────────────── -->
+  <header class="sticky top-0 z-50 bg-[#080C14]/90 backdrop-blur-md border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <a href="/" class="flex items-center gap-3 group">
+        <% if (store.logo) { %>
+          <img src="<%= store.logo %>" alt="<%= store.name %>" class="w-10 h-10 rounded-xl object-cover shadow-lg border border-slate-700/50" />
+        <% } else { %>
+          <img src="/public/images/logo-brand.jpg" alt="<%= store.name %>" class="w-10 h-10 rounded-xl object-cover shadow-lg border border-slate-700/50 group-hover:scale-105 transition-transform" />
+        <% } %>
+        <div>
+          <div class="text-base font-extrabold text-white tracking-tight flex items-center gap-1.5">
+            <span><%= store.name %></span>
+            <span class="badge badge-xs bg-sky-500 text-white font-bold px-1.5 py-0.5">PRICELIST</span>
+          </div>
+          <p class="text-[10px] text-slate-400 font-medium hidden sm:block">Daftar Harga Modal Agen &amp; Mitra</p>
+        </div>
+      </a>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-2.5">
+        <a href="/" class="btn btn-sm btn-ghost text-slate-300 hover:text-white border border-slate-800 text-xs font-semibold gap-1.5">
+          <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+          <span class="hidden sm:inline">Etalase</span> Top-Up
+        </a>
+
+        <!-- Tombol Daftar Agen -->
+        <a href="/register" class="btn btn-sm bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white border-0 text-xs font-bold gap-1.5 shadow-md shadow-sky-600/20">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+          <span>Daftar Jadi Agen</span>
+        </a>
+
+        <% if (store.csWhatsapp) { 
+             const waClean = (store.csWhatsapp || '').replace(/\D/g, '').replace(/^0/, '62');
+        %>
+          <a href="https://wa.me/<%= waClean %>?text=<%= encodeURIComponent('Halo CS ' + store.name + ', saya ingin bertanya tentang daftar harga agen.') %>" target="_blank" rel="noopener" class="btn btn-sm btn-ghost text-emerald-400 hover:bg-emerald-950/30 border border-emerald-900/50 text-xs font-semibold gap-1.5 hidden md:inline-flex">
+            <span>CS WA</span>
+          </a>
+        <% } %>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ── Main Container ──────────────────────────────────────────────────────── -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    
+    <!-- Hero Title -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800/80">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-semibold mb-2">
+          <span>👑 Pricelist Resmi Mitra H2H</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+          Daftar Harga Produk Khusus <span class="bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent">Agen &amp; Reseller</span>
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">
+          Harga di bawah ini merupakan harga modal khusus bagi agen terdaftar di aplikasi Juragan Pulsa.
+        </p>
+      </div>
+
+      <div class="shrink-0 flex items-center gap-2">
+        <a href="/register" class="btn btn-sm bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-extrabold text-xs shadow-lg shadow-sky-600/20 gap-1.5">
+          <span>Daftar Agen untuk Harga Ini</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="glass-card rounded-2xl p-4 border border-slate-800 space-y-3">
+      
+      <!-- Top Search & Brand Filter Row -->
+      <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+        
+        <!-- Search Input (7 Cols) -->
+        <div class="sm:col-span-7 relative">
+          <input type="text" id="pricelist-search" oninput="handleSearch(this.value)" placeholder="🔍 Ketik nama produk, operator, atau SKU..." class="w-full bg-slate-950/90 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 font-mono focus:outline-none focus:border-sky-500 transition-all" />
+        </div>
+
+        <!-- Brand Selector (5 Cols) -->
+        <div class="sm:col-span-5 flex items-center justify-between sm:justify-end gap-2 text-xs">
+          <span class="text-slate-400 shrink-0 font-medium">Total:</span>
+          <span id="label-total-count" class="badge badge-sm bg-slate-800 text-sky-400 font-mono font-bold">0 Produk</span>
+        </div>
+
+      </div>
+
+      <!-- Category Filter Tabs -->
+      <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pt-2 border-t border-slate-800/80">
+        <button type="button" onclick="filterCat('ALL', this)" class="pl-cat-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-sky-600 text-white transition-all whitespace-nowrap shadow-sm shadow-sky-600/30">
+          Semua Kategori
+        </button>
+        <% categories.forEach(cat => { %>
+          <button type="button" onclick="filterCat('<%= cat %>', this)" class="pl-cat-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-all whitespace-nowrap">
+            <%= cat %>
+          </button>
+        <% }); %>
+      </div>
+
+    </div>
+
+    <!-- Table Card -->
+    <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+      <div class="overflow-x-auto">
+        <table class="table table-sm w-full text-left text-xs">
+          <thead class="bg-slate-950/90 text-slate-400 uppercase tracking-wider font-semibold text-[11px] border-b border-slate-800">
+            <tr>
+              <th class="py-3.5 px-4 w-12 text-center">No</th>
+              <th class="py-3.5 px-4">Kode SKU</th>
+              <th class="py-3.5 px-4">Nama Produk &amp; Deskripsi</th>
+              <th class="py-3.5 px-4">Kategori / Brand</th>
+              <th class="py-3.5 px-4 text-right">Harga Agen</th>
+              <th class="py-3.5 px-4 text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody id="pricelist-tbody" class="divide-y divide-slate-800/60 font-sans">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Bottom CTA Card -->
+    <div class="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-sky-950 via-slate-900 to-indigo-950 border border-sky-800/50 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="space-y-1.5 text-center sm:text-left">
+        <h3 class="text-lg sm:text-xl font-black text-white">
+          Siap Bertransaksi dengan Harga Agen Termurah?
+        </h3>
+        <p class="text-xs sm:text-sm text-slate-300">
+          Pendaftaran gratis, langsung aktif seketika, dan dapatkan QR Code Login instan untuk aplikasi Android.
+        </p>
+      </div>
+      <div class="shrink-0 flex items-center gap-3">
+        <a href="/register" class="btn btn-primary bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white border-0 font-extrabold text-xs sm:text-sm px-6 shadow-xl shadow-sky-600/30 gap-2">
+          <span>Daftar Jadi Agen Sekarang</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── Footer ──────────────────────────────────────────────────────────────── -->
+  <footer class="mt-auto border-t border-slate-800/80 bg-[#06090F] py-6 text-center text-xs text-slate-500">
+    <p>© <%= new Date().getFullYear() %> <strong><%= store.name %></strong> • Powered by <span class="text-sky-400 font-semibold">ALIJAYA NET</span></p>
+  </footer>
+
+  <!-- ── Application Script ────────────────────────────────────────────────── -->
+  <script>
+    const allProducts = <%- productsJson %>;
+    let currentCategory = 'ALL';
+    let searchQuery = '';
+
+    function formatRp(num) {
+      return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
+    }
+
+    function filterCat(cat, btn) {
+      currentCategory = cat;
+      document.querySelectorAll('.pl-cat-btn').forEach(b => {
+        b.className = 'pl-cat-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-all whitespace-nowrap';
+      });
+      if (btn) {
+        btn.className = 'pl-cat-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-sky-600 text-white transition-all whitespace-nowrap shadow-sm shadow-sky-600/30';
+      }
+      renderPricelist();
+    }
+
+    function handleSearch(val) {
+      searchQuery = (val || '').trim().toLowerCase();
+      renderPricelist();
+    }
+
+    function renderPricelist() {
+      const tbody = document.getElementById('pricelist-tbody');
+      const totalCount = document.getElementById('label-total-count');
+      tbody.innerHTML = '';
+
+      let list = allProducts;
+
+      if (currentCategory !== 'ALL') {
+        list = list.filter(p => p.category === currentCategory);
+      }
+
+      if (searchQuery) {
+        list = list.filter(p => {
+          const name = (p.product_name || '').toLowerCase();
+          const sku = (p.sku || '').toLowerCase();
+          const brand = (p.brand || '').toLowerCase();
+          const cat = (p.category || '').toLowerCase();
+          return name.includes(searchQuery) || sku.includes(searchQuery) || brand.includes(searchQuery) || cat.includes(searchQuery);
+        });
+      }
+
+      if (totalCount) {
+        totalCount.textContent = list.length + ' Produk';
+      }
+
+      if (list.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="text-center py-10 text-slate-500 text-xs">
+              Tidak ada produk yang cocok dengan pencarian Anda.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      list.forEach((p, idx) => {
+        const agentPrice = p.price_agent || p.price_sell || p.price_modal;
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-800/40 transition-colors';
+        tr.innerHTML = `
+          <td class="py-3 px-4 text-center font-mono text-slate-500">${idx + 1}</td>
+          <td class="py-3 px-4 font-mono font-bold text-sky-400">${p.sku}</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-white">${p.product_name}</div>
+            ${p.description ? `<div class="text-[10px] text-slate-400 mt-0.5">${p.description}</div>` : ''}
+          </td>
+          <td class="py-3 px-4">
+            <span class="badge badge-sm bg-slate-800 text-slate-300 border-slate-700 font-semibold text-[10px]">${p.category || '-'}</span>
+            ${p.brand ? `<span class="badge badge-sm bg-slate-900 text-slate-400 border-slate-800 text-[10px] ml-1">${p.brand}</span>` : ''}
+          </td>
+          <td class="py-3 px-4 text-right font-mono font-extrabold text-sm text-sky-300">
+            ${formatRp(agentPrice)}
+          </td>
+          <td class="py-3 px-4 text-center">
+            <span class="badge badge-xs bg-emerald-500/20 text-emerald-400 border-emerald-500/30 font-bold px-2 py-1">
+              🟢 Normal
+            </span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Inisialisasi render
+    renderPricelist();
+  </script>
+
+  <!-- Live Chat Widget -->
+  <%- include('partials/livechat_widget') %>
+
+</body>
+</html>

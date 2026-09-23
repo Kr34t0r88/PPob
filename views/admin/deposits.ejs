@@ -1,0 +1,199 @@
+<%- include('../partials/header') %>
+
+<div class="space-y-5">
+
+  <!-- Header Action Bar -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div>
+      <h3 class="text-lg lg:text-xl font-bold text-slate-900 dark:text-white tracking-tight">Manajemen Deposit & Rekening</h3>
+      <p class="text-xs text-slate-500">Verifikasi tiket deposit saldo agen (QRIS statis & transfer bank) serta kelola rekening tujuan.</p>
+    </div>
+    <button onclick="document.getElementById('modal-add-bank').showModal()" class="btn btn-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 text-xs font-semibold gap-1.5 shadow-sm">
+      <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+      <span>Tambah Rekening / QRIS</span>
+    </button>
+  </div>
+
+  <!-- Bank Accounts List (Cards) -->
+  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-3">
+    <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+      <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Rekening Tujuan Transfer Agen</h4>
+      <span class="text-[11px] text-slate-400">Total <%= bankAccounts.length %> Rekening</span>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <% if (bankAccounts && bankAccounts.length > 0) { %>
+        <% bankAccounts.forEach(b => { %>
+          <div class="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 flex items-center justify-between">
+            <div>
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 uppercase">
+                <%= b.bank_name %>
+              </span>
+              <p class="font-mono font-extrabold text-sm text-slate-900 dark:text-white mt-1 select-all"><%= b.account_number %></p>
+              <p class="text-xs text-slate-500">a.n <%= b.account_name %></p>
+            </div>
+            <div class="flex flex-col gap-1 items-end">
+              <form action="/admin/bank-accounts/<%= b.id %>/toggle" method="POST">
+                <button type="submit" class="btn btn-xs <%= b.is_active ? 'btn-ghost text-emerald-600 hover:bg-emerald-50' : 'btn-ghost text-slate-400' %> text-[11px] font-semibold">
+                  <%= b.is_active ? 'Aktif' : 'Off' %>
+                </button>
+              </form>
+              <form action="/admin/bank-accounts/<%= b.id %>/delete" method="POST" onsubmit="return confirm('Hapus rekening ini?')">
+                <button type="submit" class="btn btn-xs btn-ghost text-red-400 hover:bg-red-50 text-[11px]">Hapus</button>
+              </form>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <p class="text-xs text-slate-400 col-span-3 py-2">Belum ada rekening bank atau QRIS yang ditambahkan.</p>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Deposit Requests Section -->
+  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden space-y-4">
+    
+    <!-- Filter Tabs & Search -->
+    <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+        <a href="/admin/deposits" class="px-3 py-1 rounded-lg text-xs font-semibold <%= !filter.status ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900' %>">Semua</a>
+        <a href="/admin/deposits?status=pending" class="px-3 py-1 rounded-lg text-xs font-semibold <%= filter.status === 'pending' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900' %>">Pending</a>
+        <a href="/admin/deposits?status=approved" class="px-3 py-1 rounded-lg text-xs font-semibold <%= filter.status === 'approved' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900' %>">Disetujui</a>
+        <a href="/admin/deposits?status=rejected" class="px-3 py-1 rounded-lg text-xs font-semibold <%= filter.status === 'rejected' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900' %>">Ditolak</a>
+      </div>
+
+      <form action="/admin/deposits" method="GET" class="flex gap-2">
+        <input type="text" name="q" value="<%= filter.q || '' %>" placeholder="Cari kode, nama agen..." class="input-fintech text-xs w-full sm:w-56" />
+        <button type="submit" class="btn btn-sm bg-slate-900 hover:bg-slate-800 text-white border-0 text-xs">Cari</button>
+      </form>
+    </div>
+
+    <!-- Deposit Requests Table (Horizontal Touch-Scroll) -->
+    <div class="overflow-x-auto">
+      <table class="fintech-table">
+        <thead>
+          <tr>
+            <th>ID / Waktu</th>
+            <th>Kode Tiket Unik</th>
+            <th>Agen</th>
+            <th>Nominal Transfer</th>
+            <th>Rekening Tujuan</th>
+            <th>Bukti Transfer</th>
+            <th>Status</th>
+            <th class="text-right">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (deposits && deposits.length > 0) { %>
+            <% deposits.forEach(d => { %>
+              <tr>
+                <td>
+                  <span class="font-mono text-xs text-slate-400">#<%= d.id %></span>
+                  <p class="text-[10px] text-slate-400 font-mono whitespace-nowrap"><%= formatDateTime(d.created_at) %></p>
+                </td>
+                <td>
+                  <button type="button" onclick="copyToClipboard('<%= d.deposit_code %>', 'Kode Deposit')" class="btn-copy" title="Salin Kode">
+                    <span><%= d.deposit_code %></span>
+                    <svg class="w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+                  </button>
+                </td>
+                <td>
+                  <p class="text-xs font-bold text-slate-900 dark:text-white"><%= d.agent_name %></p>
+                  <p class="text-[10px] text-slate-400 font-mono"><%= d.agent_phone %></p>
+                </td>
+                <td>
+                  <span class="font-mono font-bold text-xs text-emerald-600 dark:text-emerald-400"><%= formatRupiah(d.amount) %></span>
+                </td>
+                <td class="text-xs text-slate-600 dark:text-slate-300"><%= d.bank_name || '-' %></td>
+                <td>
+                  <% if (d.proof_image) { %>
+                    <a href="<%= d.proof_image %>" target="_blank" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 hover:underline">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                      <span>Lihat Bukti</span>
+                    </a>
+                  <% } else { %>
+                    <span class="text-xs text-slate-400">-</span>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (d.status === 'approved') { %>
+                    <span class="badge-status badge-status-success">
+                      <span class="dot-pulse dot-pulse-success"></span> Disetujui
+                    </span>
+                  <% } else if (d.status === 'pending') { %>
+                    <span class="badge-status badge-status-pending">
+                      <span class="dot-pulse dot-pulse-pending"></span> Pending
+                    </span>
+                  <% } else { %>
+                    <span class="badge-status badge-status-failed">
+                      <span class="dot-pulse dot-pulse-failed"></span> Ditolak
+                    </span>
+                  <% } %>
+                </td>
+                <td class="text-right space-x-1">
+                  <% if (d.status === 'pending') { %>
+                    <form action="/admin/deposits/<%= d.id %>/approve" method="POST" class="inline" onsubmit="return confirm('Setujui tiket deposit <%= d.deposit_code %> sebesar <%= formatRupiah(d.amount) %>?')">
+                      <button type="submit" class="btn btn-xs bg-emerald-600 hover:bg-emerald-700 text-white border-0 font-semibold text-[11px]">Setujui</button>
+                    </form>
+                    <form action="/admin/deposits/<%= d.id %>/reject" method="POST" class="inline" onsubmit="return confirm('Tolak permohonan deposit ini?')">
+                      <button type="submit" class="btn btn-xs btn-ghost text-red-500 hover:bg-red-50 text-[11px]">Tolak</button>
+                    </form>
+                  <% } else { %>
+                    <span class="text-[10px] text-slate-400">Oleh <%= d.reviewed_by || 'Admin' %></span>
+                  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="8" class="text-center py-10 text-xs text-slate-400">Tidak ada data permohonan deposit.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <% if (pagination && pagination.totalPages > 1) { %>
+      <div class="p-3.5 border-t border-slate-100 dark:border-slate-800 flex justify-center">
+        <div class="join">
+          <% for(let i = 1; i <= pagination.totalPages; i++) { %>
+            <a href="/admin/deposits?page=<%= i %>&status=<%= filter.status || '' %>&q=<%= filter.q || '' %>"
+               class="join-item btn btn-xs <%= pagination.page === i ? 'btn-active bg-blue-600 text-white border-0' : 'btn-ghost' %>">
+              <%= i %>
+            </a>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+
+  </div>
+
+</div>
+
+<!-- Modal Tambah Rekening -->
+<dialog id="modal-add-bank" class="modal">
+  <div class="modal-box max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+    <h3 class="font-bold text-base text-slate-900 dark:text-white mb-4">Tambah Rekening Bank / QRIS</h3>
+    <form action="/admin/bank-accounts" method="POST" class="space-y-3.5">
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Nama Bank / E-Wallet</label>
+        <input type="text" name="bank_name" placeholder="BCA / BRI / Mandiri / QRIS" required class="input-fintech w-full" />
+      </div>
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Nomor Rekening / No. Akun</label>
+        <input type="text" name="account_number" placeholder="1234567890" required class="input-fintech w-full font-mono" />
+      </div>
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Atas Nama (A.N)</label>
+        <input type="text" name="account_name" placeholder="Juragan Pulsa" required class="input-fintech w-full" />
+      </div>
+      <div class="modal-action pt-2 flex justify-end gap-2">
+        <button type="button" onclick="document.getElementById('modal-add-bank').close()" class="btn btn-sm btn-ghost text-xs">Batal</button>
+        <button type="submit" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-0 text-xs font-semibold">Simpan Rekening</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<%- include('../partials/footer') %>

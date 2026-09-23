@@ -1,0 +1,339 @@
+<%- include('../partials/header') %>
+
+<div class="space-y-6">
+
+  <!-- Header Action Bar -->
+  <div class="flex flex-col sm:flex-row sm:items-start sm:items-center justify-between gap-4">
+    <div>
+      <h3 class="text-lg lg:text-xl font-bold text-slate-900 dark:text-white tracking-tight">Koneksi & Gateway Provider H2H</h3>
+      <p class="text-xs text-slate-500">Konfigurasi endpoint API vendor, kredensial autentikasi MD5, webhook callback, dan pemantauan gateway.</p>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <form action="/admin/products/sync" method="POST" onsubmit="this.querySelector('button').disabled=true; this.querySelector('button').innerHTML='Menyinkronkan...';">
+        <button type="submit" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-0 text-xs font-semibold gap-1.5 shadow-sm">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          <span>Sync Katalog Produk</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Gateway Stats Overview Cards -->
+  <% const mainProvider = providers.length > 0 ? providers[0] : null; %>
+  <% const mainStats = mainProvider && stats[mainProvider.id] ? stats[mainProvider.id] : { products: { total: 0, active: 0 }, transactions: { total: 0, success: 0, pending: 0, failed: 0 }, lastSync: null }; %>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    
+    <!-- Stat 1: Saldo Provider H2H -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-4 shadow-sm flex items-center justify-between">
+      <div>
+        <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Saldo Digiflazz</p>
+        <p class="text-lg lg:text-xl font-black text-emerald-600 dark:text-emerald-400 font-mono mt-0.5">
+          <%= mainProvider ? formatRupiah(mainProvider.balance) : 'Rp 0' %>
+        </p>
+        <p class="text-[10px] text-slate-400 mt-0.5">
+          <%= mainProvider && mainProvider.balance_updated_at ? 'Update: ' + formatDateTime(mainProvider.balance_updated_at) : 'Belum dicek' %>
+        </p>
+      </div>
+      <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 flex items-center justify-center">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      </div>
+    </div>
+
+    <!-- Stat 2: Total SKU Tersinkron -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-4 shadow-sm flex items-center justify-between">
+      <div>
+        <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Katalog Produk</p>
+        <p class="text-lg lg:text-xl font-black text-slate-900 dark:text-white font-mono mt-0.5">
+          <%= mainStats.products.active %> <span class="text-xs font-normal text-slate-400">/ <%= mainStats.products.total %> SKU</span>
+        </p>
+        <p class="text-[10px] text-emerald-500 font-medium mt-0.5">
+          <%= mainStats.products.active %> produk aktif dijual
+        </p>
+      </div>
+      <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 flex items-center justify-center">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+      </div>
+    </div>
+
+    <!-- Stat 3: Total Transaksi Terproses -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-4 shadow-sm flex items-center justify-between">
+      <div>
+        <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Trx via Provider</p>
+        <p class="text-lg lg:text-xl font-black text-slate-900 dark:text-white font-mono mt-0.5">
+          <%= mainStats.transactions.total %> <span class="text-xs font-normal text-slate-400">Total</span>
+        </p>
+        <p class="text-[10px] text-slate-500 mt-0.5">
+          <span class="text-emerald-500 font-bold"><%= mainStats.transactions.success %> Sukses</span> &bull; 
+          <span class="text-amber-500 font-bold"><%= mainStats.transactions.pending %> Pending</span>
+        </p>
+      </div>
+      <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 flex items-center justify-center">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+      </div>
+    </div>
+
+    <!-- Stat 4: Status Webhook Engine -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-4 shadow-sm flex items-center justify-between">
+      <div>
+        <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Webhook Engine</p>
+        <div class="flex items-center gap-1.5 mt-0.5">
+          <span class="dot-pulse dot-pulse-success"></span>
+          <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">Siap Menerima</span>
+        </div>
+        <p class="text-[10px] text-slate-400 mt-0.5">
+          HMAC-SHA1 Auto Verify
+        </p>
+      </div>
+      <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 flex items-center justify-center">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Main 2-Column Split: Provider Form (Left) & Guide + Logs (Right) -->
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+
+    <!-- Left Column: Provider Configuration Cards (xl:col-span-7) -->
+    <div class="xl:col-span-7 space-y-6">
+      
+      <% providers.forEach(p => { %>
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 lg:p-6 shadow-sm space-y-5">
+          
+          <!-- Header Provider Card -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-black text-sm shadow-md shadow-blue-500/20">
+                <%= p.name.slice(0, 2).toUpperCase() %>
+              </div>
+              <div>
+                <h4 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                  <%= p.label %>
+                  <% if (p.is_default) { %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 uppercase">
+                      Default Hub
+                    </span>
+                  <% } %>
+                </h4>
+                <p class="text-xs text-slate-400 font-mono">Kode Provider: <%= p.name %> &bull; Engine: Digiflazz Adapter v1</p>
+              </div>
+            </div>
+            
+            <div>
+              <% if (p.is_active) { %>
+                <span class="badge-status badge-status-success">
+                  <span class="dot-pulse dot-pulse-success"></span> Aktif & Terhubung
+                </span>
+              <% } else { %>
+                <span class="badge-status badge-status-failed">
+                  <span class="dot-pulse dot-pulse-failed"></span> Nonaktif
+                </span>
+              <% } %>
+            </div>
+          </div>
+
+          <!-- Balance Live Card -->
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <p class="text-xs text-slate-500 font-semibold">Deposit Saldo di Akun Digiflazz</p>
+              <p class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5 font-mono"><%= formatRupiah(p.balance) %></p>
+              <p class="text-[10px] text-slate-400 mt-0.5">
+                Terakhir diperiksa: <%= p.balance_updated_at ? formatDateTime(p.balance_updated_at) : 'Belum pernah dicek' %>
+              </p>
+            </div>
+            <div>
+              <form action="/admin/providers/<%= p.id %>/check-balance" method="POST" onsubmit="this.querySelector('button').disabled=true; this.querySelector('button').innerHTML='Memeriksa...';">
+                <button type="submit" class="btn btn-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 text-xs font-semibold gap-1.5 shadow-sm w-full sm:w-auto">
+                  <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                  <span>Cek Saldo Live</span>
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Webhook Info Box -->
+          <div class="p-4 bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200/70 dark:border-blue-900/40 rounded-xl space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                <span class="text-xs font-bold text-blue-900 dark:text-blue-300">URL Webhook Callback Server Anda:</span>
+              </div>
+              <button type="button" onclick="copyToClipboard('<%= (process.env.APP_URL || 'http://localhost:5000') %>/webhook/digiflazz', 'URL Webhook')" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                <span>Salin URL</span>
+              </button>
+            </div>
+            <div class="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-blue-200/60 dark:border-blue-900/40 font-mono text-xs text-blue-700 dark:text-blue-300 break-all select-all flex items-center justify-between">
+              <span><%= (process.env.APP_URL || 'http://localhost:5000') %>/webhook/digiflazz</span>
+            </div>
+            <p class="text-[11px] text-blue-700/80 dark:text-blue-400/80">
+              Tempelkan URL ini di menu <strong>Pengaturan &gt; Webhook</strong> pada Member Area Digiflazz.
+            </p>
+          </div>
+
+          <!-- Configuration Form -->
+          <form action="/admin/providers/<%= p.id %>/edit" method="POST" class="space-y-4 pt-1">
+            
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Nama Tampilan Provider</label>
+              <input type="text" name="label" value="<%= p.label %>" required class="input-fintech w-full" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Endpoint API Base URL</label>
+              <input type="text" name="api_url" value="<%= p.api_url %>" required class="input-fintech w-full font-mono text-xs" />
+              <p class="text-[10px] text-slate-400 mt-1">Default Digiflazz: <code class="font-mono text-blue-600">https://api.digiflazz.com/v1</code></p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Username / Buyer Code</label>
+                <input type="text" name="username" value="<%= p.username || '' %>" placeholder="username digiflazz" class="input-fintech w-full font-mono text-xs" />
+                <p class="text-[10px] text-slate-400 mt-1">Sama persis dengan username akun Digiflazz Anda.</p>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Production / Dev API Key</label>
+                <div class="relative">
+                  <input type="password" id="api_key_input_<%= p.id %>" name="api_key" value="<%= p.api_key || '' %>" placeholder="dev-xxxx / prod-xxxx" class="input-fintech w-full font-mono text-xs pr-10" />
+                  <button type="button" onclick="const input = document.getElementById('api_key_input_<%= p.id %>'); input.type = input.type === 'password' ? 'text' : 'password';" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">
+                    👁️
+                  </button>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1">Prefix <code class="font-mono font-bold text-slate-600">dev-</code> untuk testing, <code class="font-mono font-bold text-slate-600">prod-</code> untuk transaksi riil.</p>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Webhook Secret Key (HMAC-SHA1)</label>
+              <input type="password" name="webhook_secret" value="<%= p.webhook_secret || '' %>" placeholder="Secret key dari menu Webhook di dashboard Digiflazz" class="input-fintech w-full font-mono text-xs" />
+              <p class="text-[10px] text-slate-400 mt-1">Kunci rahasia untuk memvalidasi tanda tangan digital payload notifikasi.</p>
+            </div>
+
+            <div class="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl flex flex-wrap items-center gap-6">
+              <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-300">
+                <input type="checkbox" name="is_active" value="1" <%= p.is_active ? 'checked' : '' %> class="checkbox checkbox-xs rounded checkbox-primary" />
+                <span>Aktifkan Gateway Ini</span>
+              </label>
+
+              <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-300">
+                <input type="checkbox" name="is_default" value="1" <%= p.is_default ? 'checked' : '' %> class="checkbox checkbox-xs rounded checkbox-primary" />
+                <span>Jadikan Default Provider</span>
+              </label>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <span class="text-xs text-slate-400">Pastikan IP server sudah di-whitelist.</span>
+              <button type="submit" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-0 text-xs font-semibold px-4 shadow-sm">
+                Simpan Konfigurasi Provider
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      <% }) %>
+
+    </div>
+
+    <!-- Right Column: Setup Guide, Server Whitelist & Webhook Activity Logs (xl:col-span-5) -->
+    <div class="xl:col-span-5 space-y-6">
+
+      <!-- Guide 1: Panduan Whitelist IP & Integrasi Member Area -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 lg:p-6 shadow-sm space-y-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/50 text-amber-600 flex items-center justify-center font-bold text-sm">
+            🛡️
+          </div>
+          <div>
+            <h4 class="font-bold text-sm text-slate-900 dark:text-white">Panduan Integrasi Digiflazz</h4>
+            <p class="text-[11px] text-slate-400">Checklist konfigurasi pada dashboard Digiflazz</p>
+          </div>
+        </div>
+
+        <div class="space-y-3 text-xs text-slate-600 dark:text-slate-400">
+          
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-800 space-y-1">
+            <p class="font-bold text-slate-900 dark:text-slate-200 flex items-center gap-1.5">
+              <span>1. Whitelist IP Publik Server</span>
+            </p>
+            <p class="text-[11px] leading-relaxed">
+              Daftarkan IP Publik server / VPS Anda di Member Area Digiflazz pada menu <strong>Pengaturan &gt; IP Whitelist</strong>. Request dari IP yang tidak terdaftar akan ditolak dengan Response Code <code class="font-mono font-bold text-rose-500">RC 43 (IP Unauthorized)</code>.
+            </p>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-800 space-y-1">
+            <p class="font-bold text-slate-900 dark:text-slate-200 flex items-center gap-1.5">
+              <span>2. Mode Sandbox vs Live</span>
+            </p>
+            <ul class="text-[11px] list-disc list-inside space-y-0.5">
+              <li><strong>Development</strong>: Gunakan key berawalan <code class="font-mono text-blue-600">dev-xxxx</code> untuk testing bebas biaya.</li>
+              <li><strong>Production</strong>: Gunakan key berawalan <code class="font-mono text-emerald-600">prod-xxxx</code> untuk transaksi riil yang memotong saldo deposit.</li>
+            </ul>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-800 space-y-1">
+            <p class="font-bold text-slate-900 dark:text-slate-200 flex items-center gap-1.5">
+              <span>3. Respon Status Kode (RC)</span>
+            </p>
+            <div class="grid grid-cols-3 gap-1.5 pt-1 text-center font-mono text-[10px]">
+              <div class="p-1.5 rounded bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-bold border border-emerald-200/50">
+                RC 00<br><span class="font-sans font-normal text-[9px]">Sukses (SN)</span>
+              </div>
+              <div class="p-1.5 rounded bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 font-bold border border-amber-200/50">
+                RC 03<br><span class="font-sans font-normal text-[9px]">Pending</span>
+              </div>
+              <div class="p-1.5 rounded bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400 font-bold border border-rose-200/50">
+                Lainnya<br><span class="font-sans font-normal text-[9px]">Auto-Refund</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Guide 2: Webhook Real-time Activity Log -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 lg:p-6 shadow-sm space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-blue-500 animate-ping"></div>
+            <h4 class="font-bold text-sm text-slate-900 dark:text-white">Log Webhook Terkini</h4>
+          </div>
+          <span class="text-[10px] font-mono text-slate-400">5 Event Terakhir</span>
+        </div>
+
+        <% if (recentWebhooks && recentWebhooks.length > 0) { %>
+          <div class="space-y-2">
+            <% recentWebhooks.forEach(wh => { %>
+              <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-800 flex items-center justify-between text-xs">
+                <div>
+                  <p class="font-bold font-mono text-slate-800 dark:text-slate-200"><%= wh.ref_id || 'Ping / Handshake' %></p>
+                  <p class="text-[10px] text-slate-400"><%= formatDateTime(wh.created_at) %> &bull; IP: <%= wh.ip || '127.0.0.1' %></p>
+                </div>
+                <div class="text-right">
+                  <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold <%= wh.signature_ok ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400' %>">
+                    <%= wh.signature_ok ? 'Signature OK' : 'Sig Invalid' %>
+                  </span>
+                  <p class="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-400 mt-0.5"><%= wh.status || 'Received' %></p>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div class="py-8 text-center bg-slate-50/50 dark:bg-slate-800/30 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+            <svg class="w-8 h-8 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            <p class="text-xs font-semibold text-slate-500">Belum ada payload webhook masuk</p>
+            <p class="text-[10px] text-slate-400 mt-0.5">Event callback otomatis tercatat di sini saat transaksi berlangsung.</p>
+          </div>
+        <% } %>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<%- include('../partials/footer') %>

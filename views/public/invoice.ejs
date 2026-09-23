@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="<%= store.logo || '/public/images/favicon.png' %>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  
+  <!-- DaisyUI & Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #080C14;
+      color: #E2E8F0;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .golden-sn-box {
+      background: linear-gradient(135deg, rgba(234, 179, 8, 0.15) 0%, rgba(202, 138, 4, 0.25) 100%);
+      border: 1px solid rgba(234, 179, 8, 0.4);
+    }
+    @media print {
+      body { background: white !important; color: black !important; }
+      .no-print { display: none !important; }
+      .glass-card { border: 1px solid #ddd !important; background: white !important; color: black !important; box-shadow: none !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-blue-600 selection:text-white p-3 sm:p-6">
+
+  <!-- ── Header ─────────────────────────────────────────────────────────────── -->
+  <header class="max-w-xl mx-auto w-full flex items-center justify-between py-2 no-print">
+    <a href="/" class="btn btn-sm btn-ghost text-slate-400 hover:text-white text-xs gap-1.5 px-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+      <span>Kembali ke Toko</span>
+    </a>
+    <div class="text-xs font-bold text-slate-400 font-mono"><%= order.invoice_code %></div>
+  </header>
+
+  <!-- ── Main Card ───────────────────────────────────────────────────────────── -->
+  <main class="max-w-xl mx-auto w-full my-auto space-y-4">
+    
+    <div class="glass-card rounded-3xl p-5 sm:p-7 shadow-2xl border border-slate-800 space-y-5">
+      
+      <!-- Top Status Banner -->
+      <div class="text-center space-y-1.5 pb-4 border-b border-slate-800/80">
+        <div id="status-badge-container">
+          <% if (order.status === 'success') { %>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold font-mono">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span>TRANSAKSI SUKSES</span>
+            </div>
+          <% } else if (order.status === 'processing' || order.status === 'paid') { %>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs font-bold font-mono">
+              <span class="loading loading-spinner loading-xs"></span>
+              <span>SEDANG DIPROSES</span>
+            </div>
+          <% } else if (order.status === 'expired') { %>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-500/20 text-slate-400 border border-slate-500/30 text-xs font-bold font-mono">
+              <span>WAKTU PEMBAYARAN KEDALUWARSA</span>
+            </div>
+          <% } else if (order.status === 'failed') { %>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-bold font-mono">
+              <span>TRANSAKSI GAGAL</span>
+            </div>
+          <% } else { %>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold font-mono">
+              <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+              <span>MENUNGGU PEMBAYARAN</span>
+            </div>
+          <% } %>
+        </div>
+
+        <h1 class="text-lg font-extrabold text-white tracking-tight"><%= order.product_name %></h1>
+        <p class="text-xs text-slate-400">Tujuan: <span class="font-mono text-white font-bold"><%= order.target_combined %></span></p>
+      </div>
+
+      <!-- Golden SN / Token Box (Visible when SUCCESS) -->
+      <div id="section-success-sn" class="<%= order.status === 'success' ? '' : 'hidden' %>">
+        <div class="golden-sn-box rounded-2xl p-4 text-center space-y-2">
+          <div class="text-[11px] font-extrabold uppercase tracking-wider text-amber-300">
+            <%= (order.category === 'PLN' || order.product_name.includes('PLN') || order.product_name.includes('Token')) ? '⚡ TOKEN LISTRIK PLN' : '🎟️ SERIAL NUMBER (SN)' %>
+          </div>
+          <div class="text-lg sm:text-xl font-black font-mono text-yellow-300 tracking-wider select-all" id="sn-value">
+            <%= order.sn || 'TRANSAKSI-BERHASIL' %>
+          </div>
+          <button type="button" onclick="copySn()" class="btn btn-xs bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-400/40 text-[11px] font-bold gap-1 mx-auto no-print">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+            <span id="copy-sn-btn-text">Salin SN / Token</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- QRIS Display Section (Visible when PENDING) -->
+      <div id="section-pending-qris" class="<%= order.status === 'pending' ? '' : 'hidden' %> space-y-4">
+        
+        <!-- Countdown Timer -->
+        <div class="flex items-center justify-between px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs">
+          <span class="text-slate-400">Selesaikan pembayaran dalam:</span>
+          <span id="countdown-timer" class="font-mono font-bold text-amber-400 text-sm">15:00</span>
+        </div>
+
+        <!-- QRIS Container -->
+        <div class="bg-white p-4 rounded-2xl text-center space-y-3 shadow-inner">
+          <div class="flex items-center justify-between border-b pb-2 text-slate-800">
+            <span class="text-xs font-bold">QRIS NASIONAL</span>
+            <span class="text-[10px] font-mono text-slate-500">SEMUA PEMBAYARAN</span>
+          </div>
+          
+          <div class="flex justify-center my-1">
+            <% if (qrImage) { %>
+              <img id="qris-img-tag" src="<%= qrImage %>" alt="QRIS Dinamis" class="w-56 h-56 object-contain rounded-lg border border-slate-200" />
+            <% } else { %>
+              <div class="w-56 h-56 flex items-center justify-center bg-slate-100 rounded-lg text-slate-400 text-xs">Menyiapkan QRIS...</div>
+            <% } %>
+          </div>
+
+          <p class="text-[11px] text-slate-600 font-medium">Scan menggunakan BCA, Mandiri, BRI, DANA, GoPay, OVO, ShopeePay, dll.</p>
+        </div>
+
+        <!-- Transfer Exact Nominal Box -->
+        <div class="p-3.5 rounded-2xl bg-blue-950/40 border border-blue-900/60 space-y-1 text-center">
+          <div class="text-[11px] text-blue-300 font-medium">TOTAL PEMBAYARAN (NOMINAL TEPAT):</div>
+          <div class="flex items-center justify-center gap-2">
+            <span class="text-xl sm:text-2xl font-black font-mono text-emerald-400"><%= formatRupiah(order.total_amount) %></span>
+            <button type="button" onclick="copyNominal('<%= order.total_amount %>')" class="btn btn-xs btn-ghost text-blue-400 hover:bg-blue-900/30 text-[10px] font-mono" title="Salin Nominal">
+              Salin
+            </button>
+          </div>
+          <p class="text-[10px] text-slate-400">Wajib transfer tepat <b><%= formatRupiah(order.total_amount) %></b> termasuk kode unik agar terverifikasi otomatis.</p>
+        </div>
+
+      </div>
+
+      <!-- Order Details Summary -->
+      <div class="space-y-2 text-xs pt-2 border-t border-slate-800/80">
+        <div class="flex justify-between text-slate-400">
+          <span>No. Invoice</span>
+          <span class="font-mono text-slate-200 font-semibold"><%= order.invoice_code %></span>
+        </div>
+        <div class="flex justify-between text-slate-400">
+          <span>Harga Produk</span>
+          <span class="font-mono text-slate-200"><%= formatRupiah(order.price_public) %></span>
+        </div>
+        <div class="flex justify-between text-slate-400">
+          <span>Kode Unik Verifikasi</span>
+          <span class="font-mono text-blue-400">+<%= formatRupiah(order.unique_code) %></span>
+        </div>
+        <% if (order.buyer_phone) { %>
+          <div class="flex justify-between text-slate-400">
+            <span>WhatsApp Pembeli</span>
+            <span class="font-mono text-slate-200"><%= order.buyer_phone %></span>
+          </div>
+        <% } %>
+        <div class="flex justify-between text-slate-400">
+          <span>Waktu Pemesanan</span>
+          <span class="text-slate-200"><%= formatDateTime(order.created_at) %></span>
+        </div>
+      </div>
+
+      <!-- Action Buttons (Print / Refresh) -->
+      <div class="flex items-center gap-2 pt-2 no-print">
+        <button type="button" onclick="window.print()" class="btn btn-sm flex-1 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-semibold gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+          <span>Cetak Bukti</span>
+        </button>
+        
+        <button type="button" onclick="checkStatusManual()" class="btn btn-sm flex-1 bg-blue-600 hover:bg-blue-500 text-white border-0 text-xs font-bold gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          <span>Cek Status</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Help Box -->
+    <% if (store.csWhatsapp) { 
+         const waNum = (store.csWhatsappFormatted || store.csWhatsapp || '').replace(/\D/g, '').replace(/^0/, '62');
+    %>
+      <div class="text-center text-xs text-slate-500 space-y-1 no-print">
+        <p>Butuh bantuan dengan pesanan ini? <a href="https://wa.me/<%= waNum %>?text=Halo%20Admin,%20saya%20konfirmasi%20invoice%20<%= order.invoice_code %>" target="_blank" class="text-emerald-400 font-bold hover:underline">Hubungi WhatsApp CS (<%= store.csWhatsapp %>)</a></p>
+      </div>
+    <% } %>
+
+
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────────────────────────── -->
+  <footer class="max-w-xl mx-auto w-full text-center text-slate-600 text-[11px] py-4 no-print">
+    &copy; <%= new Date().getFullYear() %> <%= store.name %> • Sistem H2H Otomatis 24 Jam
+  </footer>
+
+  <!-- ── Status Poller & Countdown Script ───────────────────────────────────── -->
+  <script>
+    const invoiceCode = '<%= order.invoice_code %>';
+    const expiredAt = new Date('<%= order.expired_at %>').getTime();
+    let orderStatus = '<%= order.status %>';
+
+    // Countdown Timer
+    function updateCountdown() {
+      if (orderStatus !== 'pending') return;
+      const now = new Date().getTime();
+      const diff = expiredAt - now;
+
+      if (diff <= 0) {
+        document.getElementById('countdown-timer').textContent = 'KEDALUWARSA';
+        document.getElementById('countdown-timer').className = 'font-mono font-bold text-rose-400 text-sm';
+        return;
+      }
+
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((diff % (1000 * 60)) / 1000);
+      document.getElementById('countdown-timer').textContent = 
+        String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    }
+
+    if (orderStatus === 'pending') {
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    }
+
+    // Auto Polling Status (Every 3 seconds)
+    async function checkStatus() {
+      if (orderStatus === 'success' || orderStatus === 'expired') return;
+
+      try {
+        const res = await fetch(`/api/public/order/${invoiceCode}/status`);
+        const data = await res.json();
+
+        if (data.success && data.status !== orderStatus) {
+          orderStatus = data.status;
+          window.location.reload();
+        }
+      } catch (_) {}
+    }
+
+    if (orderStatus === 'pending' || orderStatus === 'processing' || orderStatus === 'paid') {
+      setInterval(checkStatus, 3000);
+    }
+
+    function checkStatusManual() {
+      fetch(`/api/public/order/${invoiceCode}/status`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.success && data.status !== orderStatus) {
+            window.location.reload();
+          } else {
+            alert('Status saat ini: ' + (data.status || 'Belum ada perubahan'));
+          }
+        })
+        .catch(e => alert('Gagal cek status: ' + e.message));
+    }
+
+    function copySn() {
+      const sn = document.getElementById('sn-value').textContent.trim();
+      navigator.clipboard.writeText(sn).then(() => {
+        document.getElementById('copy-sn-btn-text').textContent = 'Tersalin!';
+        setTimeout(() => { document.getElementById('copy-sn-btn-text').textContent = 'Salin SN / Token'; }, 2000);
+      });
+    }
+
+    function copyNominal(amount) {
+      navigator.clipboard.writeText(amount).then(() => {
+        alert('Nominal Rp ' + Number(amount).toLocaleString('id-ID') + ' disalin ke clipboard!');
+      });
+    }
+  </script>
+
+  <!-- Live Chat Widget (Telegram Bridge) -->
+  <%- include('partials/livechat_widget') %>
+
+</body>
+</html>
